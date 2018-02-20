@@ -24,3 +24,4 @@ hs_err_pid*
 project-1/graddle/wrapper/
 project-1/.idea/
 project-1/project-1.iml
+!project-1/libs/*.jar
