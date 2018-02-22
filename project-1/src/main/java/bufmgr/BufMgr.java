@@ -44,7 +44,6 @@ public class BufMgr implements GlobalConst {
 	      bufpool[i] = new Page();
 	      frametab[i] = new FrameDesc(i);
 	    }
-	    
 	    // initialize the specialized page map and replacer
 	    pagemap = new HashMap<Integer, FrameDesc>(numbufs);
 	    replacer = new Clock(this);
@@ -121,7 +120,13 @@ public class BufMgr implements GlobalConst {
 	 *             if all pages are pinned (i.e. pool exceeded)
 	 */
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
-		frametab[pagemap.get(pageno.getPID())].pincnt++;
+		if(skipRead==true) {
+			frametab[pageno.getPID()].pincnt++;
+		}
+//		else
+
+			//read page from disk
+		//pagemap.get(pageno.getPID()).pincnt++;
 		//throw new UnsupportedOperationException("Not implemented");
 
 	}
@@ -137,10 +142,22 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is not present or not pinned
 	 */
 	public void unpinPage(PageId pageno, boolean dirty) throws IllegalArgumentException {
-		if(dirty) {
-			flushPage(pageno);
+//		if(frametab[pageno.getPID()].pincnt<1 || frametab[pageno.getPID()]==null)
+//		{
+//			throw new IllegalArgumentException("Illegal! " +  pageno.toString());
+//		}
+		try{
+			if(dirty) {
+				flushPage(pageno);
+			}
+			frametab[pageno.getPID()].pincnt--;
 		}
-		frametab[pagemap.get(pageno.getPID()).index].pincnt--;
+		catch(IllegalArgumentException e)
+		{
+			System.out.println("Illegal argument exception: " + e);
+		}
+
+
 		//throw new UnsupportedOperationException("Not implemented");
 
 	}
