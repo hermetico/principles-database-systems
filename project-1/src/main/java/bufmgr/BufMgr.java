@@ -121,8 +121,8 @@ public class BufMgr implements GlobalConst {
 	 *             if all pages are pinned (i.e. pool exceeded)
 	 */
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
-		
-		throw new UnsupportedOperationException("Not implemented");
+		frametab[pagemap.get(pageno.getPID())].pincnt++;
+		//throw new UnsupportedOperationException("Not implemented");
 
 	}
 
@@ -137,8 +137,11 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is not present or not pinned
 	 */
 	public void unpinPage(PageId pageno, boolean dirty) throws IllegalArgumentException {
-		
-		throw new UnsupportedOperationException("Not implemented");
+		if(dirty) {
+			flushPage(pageno);
+		}
+		frametab[pagemap.get(pageno.getPID()).index].pincnt--;
+		//throw new UnsupportedOperationException("Not implemented");
 
 	}
 
@@ -147,7 +150,7 @@ public class BufMgr implements GlobalConst {
 	 */
 	public void flushPage(PageId pageno) {
 		
-		throw new UnsupportedOperationException("Not implemented");
+		//throw new UnsupportedOperationException("Not implemented");
 	}
 
 	/**
@@ -163,15 +166,24 @@ public class BufMgr implements GlobalConst {
 	 * Gets the total number of buffer frames.
 	 */
 	public int getNumBuffers() {
-		throw new UnsupportedOperationException("Not implemented");
+		return frametab.length;
+		//throw new UnsupportedOperationException("Not implemented");
 	}
 
 	/**
 	 * Gets the total number of unpinned buffer frames.
 	 */
 	public int getNumUnpinned() {
-		
-		throw new UnsupportedOperationException("Not implemented");
+		int count = 0;
+		for (int i=0; i<frametab.length; i++)
+		{
+			if(frametab[i].pincnt==0)
+			{
+				count++;
+			}
+		}
+		return count;
+		//throw new UnsupportedOperationException("Not implemented");
 	}
 
 } // public class BufMgr implements GlobalConst
