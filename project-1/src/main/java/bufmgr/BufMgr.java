@@ -37,6 +37,7 @@ public class BufMgr implements GlobalConst {
 	 */
 
 	public BufMgr(int numbufs) {
+		int runcount = 0;
 	    // initialize the buffer pool and frame table
 	    bufpool = new Page[numbufs];
 	    frametab = new FrameDesc[numbufs];
@@ -122,13 +123,10 @@ public class BufMgr implements GlobalConst {
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
 		if(skipRead==true) {
 			frametab[pageno.getPID()].pincnt++;
+			//pagemap.get(pageno.getPID()).pincnt++;
+
+
 		}
-//		else
-
-			//read page from disk
-		//pagemap.get(pageno.getPID()).pincnt++;
-		//throw new UnsupportedOperationException("Not implemented");
-
 	}
 
 	/**
@@ -142,20 +140,20 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is not present or not pinned
 	 */
 	public void unpinPage(PageId pageno, boolean dirty) throws IllegalArgumentException {
-//		if(frametab[pageno.getPID()].pincnt<1 || frametab[pageno.getPID()]==null)
-//		{
-//			throw new IllegalArgumentException("Illegal! " +  pageno.toString());
-//		}
-		try{
+		if(frametab[pageno.getPID()].pincnt<1 || frametab[pageno.getPID()]==null)
+		{
+			throw new IllegalArgumentException("Illegal! Page number: " +  pageno.toString() + " Current pin count: " + frametab[pageno.getPID()].pincnt);
+		}
+		//try{
 			if(dirty) {
 				flushPage(pageno);
 			}
 			frametab[pageno.getPID()].pincnt--;
-		}
-		catch(IllegalArgumentException e)
-		{
-			System.out.println("Illegal argument exception: " + e);
-		}
+		//}
+		//catch(IllegalArgumentException e)
+		//{
+		//	System.out.println("Illegal argument exception: " + e);
+		//}
 
 
 		//throw new UnsupportedOperationException("Not implemented");
