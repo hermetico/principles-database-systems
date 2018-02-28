@@ -2,10 +2,10 @@ package bufmgr;
 
 public class Clock extends Replacer{
 
-
+	int tick;
 	protected Clock(BufMgr bufmgr) {
 		super(bufmgr);
-		// TODO Auto-generated constructor stub
+		tick = 0;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class Clock extends Replacer{
 
 	@Override
 	public void pinPage(FrameDesc fdesc) {
-		// TODO Auto-generated method stub
+
 		
 	}
 
@@ -35,6 +35,8 @@ public class Clock extends Replacer{
 	@Override
 	public int pickVictim() {
 		// TODO Auto-generated method stub
+
+		// when ticking tick = (tick + 1) % frametab.length;
 		return 0;
 	}
 
