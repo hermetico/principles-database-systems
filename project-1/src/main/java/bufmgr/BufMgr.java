@@ -1,8 +1,6 @@
 package bufmgr;
 
 import java.util.HashMap;
-import java.util.Map;
-
 import global.GlobalConst;
 import global.Minibase;
 import global.Page;
@@ -34,31 +32,31 @@ public class BufMgr implements GlobalConst {
 
 	/** The replacement policy to use. */
 	protected Replacer replacer;
-	
+
 	/**
 	 * Constructs a buffer manager with the given settings.
-	 * 
+	 *
 	 * @param numbufs: number of pages in the buffer pool
 	 */
 
 	public BufMgr(int numbufs) {
-		int runcount = 0;
-	    // initialize the buffer pool and frame table
-	    bufpool = new Page[numbufs];
-	    frametab = new FrameDesc[numbufs];
-	    for (int i = 0; i < numbufs; i++) {
-	      bufpool[i] = new Page();
-	      frametab[i] = new FrameDesc(i);
-	    }
-	    // initialize the specialized page map and replacer
-	    pagemap = new HashMap<Integer, FrameDesc>(numbufs);
-	    replacer = new Clock(this);
+		// initialize the buffer pool and frame table
+		bufpool = new Page[numbufs];
+		frametab = new FrameDesc[numbufs];
+		for (int i = 0; i < numbufs; i++) {
+			bufpool[i] = new Page();
+			frametab[i] = new FrameDesc(i);
+		}
+
+		// initialize the specialized page map and replacer
+		pagemap = new HashMap<Integer, FrameDesc>(numbufs);
+		replacer = new Clock(this);
 	}
 
 	/**
 	 * Allocates a set of new pages, and pins the first one in an appropriate
 	 * frame in the buffer pool.
-	 * 
+	 *
 	 * @param firstpg
 	 *            holds the contents of the first page 
 	 * @param run_size
@@ -72,17 +70,17 @@ public class BufMgr implements GlobalConst {
 	public PageId newPage(Page firstpg, int run_size) {
 		// allocate the run
 		PageId firstid = Minibase.DiskManager.allocate_page(run_size);
-		
+
 		// try to pin the first page
-		try {pinPage(firstid, firstpg, PIN_MEMCPY);} 
+		try {pinPage(firstid, firstpg, PIN_MEMCPY);}
 		catch (RuntimeException exc) {
-		      // roll back because pin failed
-		      for (int i = 0; i < run_size; i++) {
-		        firstid.pid += 1;
-		        Minibase.DiskManager.deallocate_page(firstid);
-		      }
-		      // re-throw the exception
-		      throw exc;
+			// roll back because pin failed
+			for (int i = 0; i < run_size; i++) {
+				firstid.pid += 1;
+				Minibase.DiskManager.deallocate_page(firstid);
+			}
+			// re-throw the exception
+			throw exc;
 		}
 		// notify the replacer and return the first new page id
 		replacer.newPage(pagemap.get(firstid.pid));
@@ -139,10 +137,12 @@ public class BufMgr implements GlobalConst {
 	 *             if all pages are pinned (i.e. pool exceeded)
 	 */
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
+	    System.out.println("Pining page " + pageno.getPID());
 		FrameDesc frame;
 		if(pagemap.containsKey(pageno.getPID())){
 			// the page is already in the map
 			frame = pagemap.get(pageno.getPID());
+
 			if(frame.pincnt > 0 && skipRead){
 				throw new IllegalArgumentException("Page " + pageno.getPID() + " pined but skipRead = false");
 			}
@@ -155,7 +155,9 @@ public class BufMgr implements GlobalConst {
 
 			int desc_id = replacer.pickVictim();
 
-			if(desc_id == -1){ throw new IllegalArgumentException("All pages are pinned! :("); }
+			if(desc_id == -1){
+				throw new IllegalArgumentException("All pages are pinned! :(");
+			}
 
 			frame = frametab[desc_id];
 			if(frame.dirty){ flushPage(frame.pageno); }
@@ -188,7 +190,7 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is not present or not pinned
 	 */
 	public void unpinPage(PageId pageno, boolean dirty) throws IllegalArgumentException {
-
+        System.out.println("Unpining page " + pageno.getPID());
 		if(!pagemap.containsKey(pageno.getPID())){
 			throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but page not in map");
 		}else{
