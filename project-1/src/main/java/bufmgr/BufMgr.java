@@ -1,6 +1,7 @@
 package bufmgr;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import global.GlobalConst;
 import global.Minibase;
@@ -24,7 +25,11 @@ public class BufMgr implements GlobalConst {
 	/** Array of descriptors, each containing the pin count, dirty status, etc. */
 	protected FrameDesc[] frametab;
 
-	/** Maps current page numbers to frames; used for efficient lookups. */
+	/** Maps current page numbers to frames; used for efficient lookups.
+	 *  if a frame is not in the map, the page associated with the integer
+	 *  is not in the pool.
+	 * */
+
 	protected HashMap<Integer, FrameDesc> pagemap;
 
 	/** The replacement policy to use. */
@@ -94,7 +99,20 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is pinned
 	 */
 	public void freePage(PageId pageno) throws IllegalArgumentException {
-		throw new UnsupportedOperationException("Not implemented");
+
+		if(pagemap.containsKey(pageno.getPID())){
+			// returns and removes the frame from the map
+			FrameDesc frame = pagemap.remove(pageno.getPID());
+			if(frame.pincnt > 0){
+				throw new IllegalArgumentException("Freepage requested on page " + pageno.getPID() + " with pincount = " + frame.pincnt);
+			}
+			replacer.freePage(frame);
+			frame.init();
+		}
+		// deallocates the page
+		Minibase.DiskManager.deallocate_page(pageno);
+
+
 	}
 
 	/**
@@ -121,12 +139,42 @@ public class BufMgr implements GlobalConst {
 	 *             if all pages are pinned (i.e. pool exceeded)
 	 */
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
-		if(skipRead==true) {
-			frametab[pageno.getPID()].pincnt++;
-			//pagemap.get(pageno.getPID()).pincnt++;
+		FrameDesc frame;
+		if(pagemap.containsKey(pageno.getPID())){
+			// the page is already in the map
+			frame = pagemap.get(pageno.getPID());
+			if(frame.pincnt > 0 && skipRead){
+				throw new IllegalArgumentException("Page " + pageno.getPID() + " pined but skipRead = false");
+			}
 
+
+
+		}else{
+			// the page is not in the map, it means it has to be copied into the pool
+			if(!skipRead){ Minibase.DiskManager.read_page(pageno, page); }
+
+			int desc_id = replacer.pickVictim();
+
+			if(desc_id == -1){ throw new IllegalArgumentException("All pages are pinned! :("); }
+
+			frame = frametab[desc_id];
+			if(frame.dirty){ flushPage(frame.pageno); }
+			pagemap.remove(frame.pageno.getPID());
+			frame.init();
+
+
+
+
+			frame.pageno = pageno;
+			bufpool[frame.index] = page;
+
+			pagemap.put(pageno.getPID(), frame);
 
 		}
+
+		// increments the pincount and notifies the replacer
+		frame.pincnt++;
+		replacer.pinPage(frame);
 	}
 
 	/**
@@ -140,40 +188,45 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is not present or not pinned
 	 */
 	public void unpinPage(PageId pageno, boolean dirty) throws IllegalArgumentException {
-		if(frametab[pageno.getPID()].pincnt<1 || frametab[pageno.getPID()]==null)
-		{
-			throw new IllegalArgumentException("Illegal! Page number: " +  pageno.toString() + " Current pin count: " + frametab[pageno.getPID()].pincnt);
-		}
-		//try{
-			if(dirty) {
-				flushPage(pageno);
+
+		if(!pagemap.containsKey(pageno.getPID())){
+			throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but page not in map");
+		}else{
+			FrameDesc frame = pagemap.get(pageno.getPID());
+			if(frame.pincnt == 0){
+				throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but pincount already 0");
 			}
-			frametab[pageno.getPID()].pincnt--;
-		//}
-		//catch(IllegalArgumentException e)
-		//{
-		//	System.out.println("Illegal argument exception: " + e);
-		//}
-
-
-		//throw new UnsupportedOperationException("Not implemented");
-
+			frame.dirty = dirty;
+			frame.pincnt--;
+			replacer.unpinPage(frame);
+		}
 	}
 
 	/**
 	 * Immediately writes a page in the buffer pool to disk, if dirty.
 	 */
 	public void flushPage(PageId pageno) {
-		
-		//throw new UnsupportedOperationException("Not implemented");
+		//TODO: we assume the page is already in the map, perhaps we can check first
+		FrameDesc frame = pagemap.get(pageno.getPID());
+		if(frame.dirty) {
+			Page page = bufpool[frame.index];
+			Minibase.DiskManager.write_page(pageno, page);
+		}
+
 	}
 
 	/**
 	 * Immediately writes all dirty pages in the buffer pool to disk.
 	 */
 	public void flushAllPages() {
-		
-		throw new UnsupportedOperationException("Not implemented");
+		// loops over the pagemap
+		// we assume that a frame in the frametab that is not in
+		// the map should be empty, then, no need to flush
+		for (FrameDesc frame: pagemap.values())
+		{
+			flushPage(frame.pageno);
+		}
+
 
 	}
 
@@ -182,13 +235,13 @@ public class BufMgr implements GlobalConst {
 	 */
 	public int getNumBuffers() {
 		return frametab.length;
-		//throw new UnsupportedOperationException("Not implemented");
 	}
 
 	/**
 	 * Gets the total number of unpinned buffer frames.
 	 */
 	public int getNumUnpinned() {
+		//TODO: check if we can mantain a counter to avoid a loop here
 		int count = 0;
 		for (int i=0; i<frametab.length; i++)
 		{
@@ -198,7 +251,6 @@ public class BufMgr implements GlobalConst {
 			}
 		}
 		return count;
-		//throw new UnsupportedOperationException("Not implemented");
 	}
 
 } // public class BufMgr implements GlobalConst
