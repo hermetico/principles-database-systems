@@ -141,13 +141,12 @@ public class BufMgr implements GlobalConst {
 		FrameDesc frame;
 		if(pagemap.containsKey(pageno.getPID())){
 			// the page is already in the map
-			frame = pagemap.get(pageno.getPID());
 
-			if(frame.pincnt > 0 && skipRead){
+			if(skipRead){
 				throw new IllegalArgumentException("Page " + pageno.getPID() + " pined but skipRead = false");
 			}
 
-
+			frame = pagemap.get(pageno.getPID());
 
 		}else{
 			// the page is not in the map, it means it has to be copied into the pool
