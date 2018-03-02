@@ -97,7 +97,7 @@ public class BufMgr implements GlobalConst {
 	 *             if the page is pinned
 	 */
 	public void freePage(PageId pageno) throws IllegalArgumentException {
-
+		System.out.println("Freeing page " + pageno.getPID());
 		if(pagemap.containsKey(pageno.getPID())){
 			// returns and removes the frame from the map
 			FrameDesc frame = pagemap.remove(pageno.getPID());
@@ -138,13 +138,15 @@ public class BufMgr implements GlobalConst {
 	 */
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
 	    System.out.println("Pining page " + pageno.getPID());
+
 		FrameDesc frame;
 		if(pagemap.containsKey(pageno.getPID())){
 			// the page is already in the map
 
 			if(skipRead){
-				throw new IllegalArgumentException("Page " + pageno.getPID() + " pined but skipRead = false");
+				throw new IllegalArgumentException("Page " + pageno.getPID() + " pined but skipRead = " + skipRead);
 			}
+
 
 			frame = pagemap.get(pageno.getPID());
 
@@ -207,6 +209,7 @@ public class BufMgr implements GlobalConst {
 	 * Immediately writes a page in the buffer pool to disk, if dirty.
 	 */
 	public void flushPage(PageId pageno) {
+		System.out.println("Flushing page " + pageno.getPID());
 		//TODO: we assume the page is already in the map, perhaps we can check first
 		FrameDesc frame = pagemap.get(pageno.getPID());
 		if(frame.dirty) {
@@ -220,6 +223,7 @@ public class BufMgr implements GlobalConst {
 	 * Immediately writes all dirty pages in the buffer pool to disk.
 	 */
 	public void flushAllPages() {
+		System.out.println("Unpining all pages");
 		// loops over the pagemap
 		// we assume that a frame in the frametab that is not in
 		// the map should be empty, then, no need to flush
@@ -235,6 +239,7 @@ public class BufMgr implements GlobalConst {
 	 * Gets the total number of buffer frames.
 	 */
 	public int getNumBuffers() {
+		System.out.println("Returning num of buffers");
 		return frametab.length;
 	}
 
@@ -243,6 +248,7 @@ public class BufMgr implements GlobalConst {
 	 */
 	public int getNumUnpinned() {
 		//TODO: check if we can mantain a counter to avoid a loop here
+		System.out.println("Returning num of pinned pages");
 		int count = 0;
 		for (int i=0; i<frametab.length; i++)
 		{
