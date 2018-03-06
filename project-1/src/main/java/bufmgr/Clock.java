@@ -20,12 +20,13 @@ public class Clock extends Replacer{
 
 	@Override
 	public void pinPage(FrameDesc fdesc) {
+		fdesc.pincnt ++;
         fdesc.state = 1;
 	}
 
 	@Override
 	public void unpinPage(FrameDesc fdesc) {
-        // TODO Auto-generated method stub
+		fdesc.pincnt--;
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class Clock extends Replacer{
             tick = (tick + 1) % frametab.length;
         }
 
-		return -1;
+		return INVALID_PAGEID;
 	}
 
 }

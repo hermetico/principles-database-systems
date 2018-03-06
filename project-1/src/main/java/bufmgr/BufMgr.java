@@ -68,9 +68,10 @@ public class BufMgr implements GlobalConst {
 	 *             if all pages are pinned (i.e. pool exceeded)
 	 */
 	public PageId newPage(Page firstpg, int run_size) {
+
 		// allocate the run
 		PageId firstid = Minibase.DiskManager.allocate_page(run_size);
-
+		System.out.println("CREATING page with id " + firstid);
 		// try to pin the first page
 		try {pinPage(firstid, firstpg, PIN_MEMCPY);}
 		catch (RuntimeException exc) {
@@ -101,6 +102,7 @@ public class BufMgr implements GlobalConst {
 		if(pagemap.containsKey(pageno.getPID())){
 			// returns and removes the frame from the map
 			FrameDesc frame = pagemap.remove(pageno.getPID());
+
 			if(frame.pincnt > 0){
 				throw new IllegalArgumentException("Freepage requested on page " + pageno.getPID() + " with pincount = " + frame.pincnt);
 			}
@@ -137,26 +139,27 @@ public class BufMgr implements GlobalConst {
 	 *             if all pages are pinned (i.e. pool exceeded)
 	 */
 	public void pinPage(PageId pageno, Page page, boolean skipRead) {
-	    System.out.println("Pining page " + pageno.getPID());
+	    System.out.println("Pining page " + pageno.getPID() + " skipRead = " + skipRead);
 
 		FrameDesc frame;
-		if(pagemap.containsKey(pageno.getPID())){
-			// the page is already in the map
 
-			if(skipRead){
-				throw new IllegalArgumentException("Page " + pageno.getPID() + " pined but skipRead = " + skipRead);
+		if(pageno.pid > 100){
+			System.out.println("error");
+		}
+		if((frame = pagemap.get(pageno.getPID())) != null){
+			// the page is already in the map
+			if(skipRead && frame.pincnt > 0){
+				throw new IllegalArgumentException("Page " + pageno.getPID() + " pinned but skipRead = " + skipRead);
 			}
 
-
-			frame = pagemap.get(pageno.getPID());
-
+			page.setPage(bufpool[frame.index]);
 		}else{
 			// the page is not in the map, it means it has to be copied into the pool
-			if(!skipRead){ Minibase.DiskManager.read_page(pageno, page); }
+			if(!skipRead){Minibase.DiskManager.read_page(pageno, page);}
 
 			int desc_id = replacer.pickVictim();
 
-			if(desc_id == -1){
+			if(desc_id == INVALID_PAGEID){
 				throw new IllegalArgumentException("All pages are pinned! :(");
 			}
 
@@ -166,17 +169,13 @@ public class BufMgr implements GlobalConst {
 			frame.init();
 
 
-
-
-			frame.pageno = pageno;
-			bufpool[frame.index] = page;
-
+			frame.pageno.copyPageId(pageno);
+			bufpool[frame.index].copyPage(page);
 			pagemap.put(pageno.getPID(), frame);
 
 		}
 
-		// increments the pincount and notifies the replacer
-		frame.pincnt++;
+		// notifies the replacer
 		replacer.pinPage(frame);
 	}
 
@@ -192,17 +191,16 @@ public class BufMgr implements GlobalConst {
 	 */
 	public void unpinPage(PageId pageno, boolean dirty) throws IllegalArgumentException {
         System.out.println("Unpining page " + pageno.getPID());
-		if(!pagemap.containsKey(pageno.getPID())){
+		FrameDesc frame;
+
+		if((frame = pagemap.get(pageno.getPID())) == null){
 			throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but page not in map");
-		}else{
-			FrameDesc frame = pagemap.get(pageno.getPID());
-			if(frame.pincnt == 0){
-				throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but pincount already 0");
-			}
-			frame.dirty = dirty;
-			frame.pincnt--;
-			replacer.unpinPage(frame);
+		}else if(frame.pincnt == 0){
+			throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but pincount already 0");
 		}
+
+		frame.dirty = dirty;
+		replacer.unpinPage(frame);
 	}
 
 	/**
