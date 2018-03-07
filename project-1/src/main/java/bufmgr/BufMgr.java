@@ -33,6 +33,8 @@ public class BufMgr implements GlobalConst {
 	/** The replacement policy to use. */
 	protected Replacer replacer;
 
+	private int unpined_frames;
+
 	/**
 	 * Constructs a buffer manager with the given settings.
 	 *
@@ -41,6 +43,7 @@ public class BufMgr implements GlobalConst {
 
 	public BufMgr(int numbufs) {
 		// initialize the buffer pool and frame table
+		unpined_frames = numbufs;
 		bufpool = new Page[numbufs];
 		frametab = new FrameDesc[numbufs];
 		for (int i = 0; i < numbufs; i++) {
@@ -185,6 +188,9 @@ public class BufMgr implements GlobalConst {
 
 		// notifies the replacer
 		replacer.pinPage(frame);
+		if(frame.pincnt == 1){
+			unpined_frames--;
+		}
 	}
 
 	/**
@@ -210,6 +216,9 @@ public class BufMgr implements GlobalConst {
 
 		frame.dirty = dirty;
 		replacer.unpinPage(frame);
+		if(frame.pincnt == 0){
+			unpined_frames++;
+		}
 	}
 
 	/**
@@ -253,17 +262,8 @@ public class BufMgr implements GlobalConst {
 	 * Gets the total number of unpinned buffer frames.
 	 */
 	public int getNumUnpinned() {
-		//TODO: check if we can mantain a counter to avoid a loop here
-
-		int count = 0;
-		for (int i=0; i<frametab.length; i++)
-		{
-			if(frametab[i].pincnt==0)
-			{
-				count++;
-			}
-		}
-		return count;
+		return unpined_frames;
 	}
+
 
 } // public class BufMgr implements GlobalConst
