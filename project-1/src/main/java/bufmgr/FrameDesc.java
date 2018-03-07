@@ -29,14 +29,15 @@ class FrameDesc {
    */
   public FrameDesc(int index) {
     this.index = index;
-    init();
+    pageno = new PageId();
+    reset();
   }
 
   /**
    * Sets the default values of an empty frame.
    */
-  public void init(){
-    pageno = new PageId();
+  public void reset(){
+
     pincnt = 0;
     dirty = false;
     state = 0;
