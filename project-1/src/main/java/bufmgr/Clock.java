@@ -31,8 +31,6 @@ public class Clock extends Replacer{
 
 	@Override
 	public int pickVictim() {
-		// worst case scenario
-
 
         for(int keep_looping = frametab.length * 2; keep_looping > 0; keep_looping--){
 
