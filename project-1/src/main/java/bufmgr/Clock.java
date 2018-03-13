@@ -20,7 +20,7 @@ public class Clock extends Replacer{
 
 	@Override
 	public void pinPage(FrameDesc fdesc) {
-		fdesc.pincnt ++;
+		fdesc.pincnt++;
         fdesc.state = 1;
 	}
 
@@ -31,7 +31,7 @@ public class Clock extends Replacer{
 
 	@Override
 	public int pickVictim() {
-
+		// worst case scenario is do a complete loop 2 times
         for(int keep_looping = frametab.length * 2; keep_looping > 0; keep_looping--){
 
             if(frametab[tick].state == 0){
@@ -40,6 +40,7 @@ public class Clock extends Replacer{
                 frametab[tick].state = 0;
             }
 
+            // increase tick to move to the next frame
             tick = (tick + 1) % frametab.length;
         }
 

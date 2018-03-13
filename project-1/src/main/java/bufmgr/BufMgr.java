@@ -106,11 +106,10 @@ public class BufMgr implements GlobalConst {
 			FrameDesc frame = pagemap.get(pageno.getPID());
 
 			if(frame.pincnt > 0){
-				//System.out.println("!!! Freepage requested on page " + pageno.getPID() + " with pincount = " + frame.pincnt);
 				throw new IllegalArgumentException("Freepage requested on page " + pageno.getPID() + " with pincount = " + frame.pincnt);
 			}
 			pagemap.remove(pageno.getPID());
-			replacer.freePage(frame);
+			//replacer.freePage(frame); do not needed
 			frame.reset();
 		}
 
@@ -170,17 +169,22 @@ public class BufMgr implements GlobalConst {
 				flushPage(frame.pageno);
 			}
 
+
 			pagemap.remove(frame.pageno.getPID());
 			frame.reset();
+			//frame.pageno = pageno; // this way fails, using copyPageId instead
 			frame.pageno.copyPageId(pageno);
 
 			if(!skipRead){
 				Minibase.DiskManager.read_page(frame.pageno, bufpool[frame.index]);
-			}
-			else{
+				//page.setPage(bufpool[frame.index]); // look 5 lines below
+			}else{
 				bufpool[frame.index].copyPage(page);
 			}
 
+			// sets the page from the pool to the page
+			// it looks weird in the case that skipRead is false, but is needed
+			// otherwise errors will raise in the Test 3
 			page.setPage(bufpool[frame.index]);
 			pagemap.put(pageno.getPID(), frame);
 
@@ -188,6 +192,7 @@ public class BufMgr implements GlobalConst {
 
 		// notifies the replacer
 		replacer.pinPage(frame);
+		// this way we can avoid looping when calling getNumUnpinned()
 		if(frame.pincnt == 1){
 			unpined_frames--;
 		}
@@ -207,15 +212,14 @@ public class BufMgr implements GlobalConst {
         //System.out.println("Unpining page " + pageno.getPID());
 		FrameDesc frame;
 		if((frame = pagemap.get(pageno.getPID())) == null){
-			//System.out.println("!!! Unpin page requested for page " + pageno.toString() + ", but page not in map");
 			throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but page not in map");
 		}else if(frame.pincnt == 0){
-			//System.out.println("!!! Unpin page requested for page " + pageno.toString() + ", but pincount already 0");
 			throw new IllegalArgumentException("Unpin page requested for page " + pageno.toString() + ", but pincount already 0");
 		}
 
 		frame.dirty = dirty;
 		replacer.unpinPage(frame);
+
 		if(frame.pincnt == 0){
 			unpined_frames++;
 		}
@@ -238,7 +242,6 @@ public class BufMgr implements GlobalConst {
 	 * Immediately writes all dirty pages in the buffer pool to disk.
 	 */
 	public void flushAllPages() {
-		System.out.println("Unpining all pages");
 		// loops over the pagemap
 		// we assume that a frame in the frametab that is not in
 		// the map should be empty, then, no need to flush
@@ -254,7 +257,7 @@ public class BufMgr implements GlobalConst {
 	 * Gets the total number of buffer frames.
 	 */
 	public int getNumBuffers() {
-		System.out.println("Returning num of buffers");
+		//System.out.println("Returning num of buffers");
 		return frametab.length;
 	}
 
