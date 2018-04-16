@@ -5,6 +5,7 @@ import com.arangodb.ArangoDBException;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
+import project2.gintonics.Entities.Primitive;
 import project2.gintonics.Services.Ifaces.ICommon;
 
 import java.io.PrintStream;
@@ -39,7 +40,6 @@ public class CollectionService  implements ICommon {
 
         try {
             CollectionEntity collection = db.createCollection(collectionName);
-            out.println("Collection created: " + collection.getName());
         } catch (ArangoDBException e) {
             err.println("Failed to create collection: " + collectionName + "; " + e.getMessage());
         }
@@ -67,14 +67,25 @@ public class CollectionService  implements ICommon {
     }
 
     @Override
-    public boolean exists(String key) {
+    public boolean exists(Primitive primitive) {
+        return collection.getDocument(primitive.getKey(), BaseDocument.class) != null;
+    }
+
+    @Override
+    public boolean existsByKey(String key) {
         return collection.getDocument(key, BaseDocument.class) != null;
+    }
+
+    @Override
+    public void delete(Primitive primitive) {
+        collection.deleteDocument(primitive.getKey());
     }
 
     @Override
     public void deleteByKey(String key) {
         collection.deleteDocument(key);
     }
+
 
     @Override
     public void insert(BaseDocument document) {

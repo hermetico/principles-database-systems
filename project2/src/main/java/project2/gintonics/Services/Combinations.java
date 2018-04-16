@@ -24,10 +24,9 @@ public class Combinations extends CollectionService {
         return super.getAll(NAME);
     }
 
-    public void insert(Combination combination) {
+    public void insert(Combination combination){
         super.insert(combination.getDocument());
     }
-
 
     public Combination getByKey(String key) {
         BaseDocument doc = collection.getDocument(key, BaseDocument.class);

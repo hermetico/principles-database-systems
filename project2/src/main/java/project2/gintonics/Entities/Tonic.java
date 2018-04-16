@@ -2,36 +2,15 @@ package project2.gintonics.Entities;
 
 import com.arangodb.entity.BaseDocument;
 
-public class Tonic {
-    private final String NAME = "name";
-    private BaseDocument document;
-
+public class Tonic extends Primitive{
     public Tonic(BaseDocument document){
-        this.document = new BaseDocument();
-        this.document.setKey(document.getKey());
-        this.document.addAttribute(NAME, document.getAttribute(NAME));
+        super(document);
+
     }
 
     public Tonic(String tonic){
-        this.document = new BaseDocument();
-        this.document.addAttribute(NAME, tonic);
-        this.document.setKey(tonic);
+        super(tonic);
+
     }
 
-    public void setTonic(String tonic){
-        this.document.addAttribute(NAME, tonic);
-        this.document.setKey(tonic);
-    }
-
-    public String getTonic(){
-        return (String) document.getAttribute(NAME);
-    }
-
-    public String toString(){
-        return getTonic();
-    }
-
-    public BaseDocument getDocument() {
-        return document;
-    }
 }

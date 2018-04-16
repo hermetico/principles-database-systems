@@ -2,36 +2,35 @@ package project2.gintonics.Entities;
 
 import com.arangodb.entity.BaseDocument;
 
-public class Combination {
+public class Combination extends Primitive{
     private final String GIN = "gin";
     private final String TONIC = "tonic";
     private final String GARNISH = "garnish";
     private final String AVG = "avg_rating";
     private final String RATINGS = "ratings";
 
-    private BaseDocument document;
-
-    public Combination(String gin, String tonic, String garnish){
-        document = new BaseDocument();
-        document.addAttribute(GIN, gin);
-        document.addAttribute(TONIC, tonic);
-        document.addAttribute(GARNISH, garnish);
+    public Combination(Gin gin, Tonic tonic, Garnish garnish){
+        super(gin + " " + tonic + " " + garnish);
+        document.addAttribute(GIN, gin.getName());
+        document.addAttribute(TONIC, tonic.getName());
+        document.addAttribute(GARNISH, garnish.getName());
         document.addAttribute(AVG, 0f);
         document.addAttribute(RATINGS, 0);
+
     }
 
-    public Combination(String gin, String tonic){
-        document = new BaseDocument();
-        document.addAttribute(GIN, gin);
-        document.addAttribute(TONIC, tonic);
+    public Combination(Gin gin, Tonic tonic){
+        super(gin + " " + tonic);
+        document.addAttribute(GIN, gin.getName());
+        document.addAttribute(TONIC, tonic.getName());
         document.addAttribute(GARNISH, "");
         document.addAttribute(AVG, 0f);
         document.addAttribute(RATINGS, 0);
+
     }
 
     public Combination(BaseDocument document){
-        this.document = new BaseDocument();
-
+        super(document);
         this.document.addAttribute(GIN, document.getAttribute(GIN));
         this.document.addAttribute(TONIC, document.getAttribute(TONIC));
         this.document.addAttribute(GARNISH, document.getAttribute(GARNISH));
@@ -41,16 +40,16 @@ public class Combination {
 
     }
 
-    public String getGin(){
-        return (String) document.getAttribute(GIN);
+    public Gin getGin(){
+        return new Gin(document.getAttribute(GIN).toString());
     }
 
-    public String getTonic(){
-        return (String) document.getAttribute(TONIC);
+    public Tonic getTonic(){
+        return new Tonic(document.getAttribute(TONIC).toString());
     }
 
-    public String getGarnish(){
-        return (String) document.getAttribute(GARNISH);
+    public Garnish getGarnish(){
+        return new Garnish(document.getAttribute(GARNISH).toString());
     }
 
     public float getAverageRating(){
@@ -64,20 +63,17 @@ public class Combination {
     public String getKey(){
         return (String) document.getKey();
     }
-    public void setGin(String gin){
-        document.addAttribute(GIN, gin);
+
+    public void setGin(Gin gin){
+        document.addAttribute(GIN, gin.toString());
     }
 
-    public void setTonic(String tonic){
-        document.addAttribute(TONIC, tonic);
+    public void setTonic(Tonic tonic){
+        document.addAttribute(TONIC, tonic.toString());
     }
 
-    public void setGarnish(String garnish){
-        document.addAttribute(GARNISH, garnish);
-    }
-
-    public void setKey(String key){
-        document.setKey(key);
+    public void setGarnish(Garnish garnish){
+        document.addAttribute(GARNISH, garnish.toString());
     }
 
     public String toString() {

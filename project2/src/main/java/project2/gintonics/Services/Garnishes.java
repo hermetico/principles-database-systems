@@ -24,10 +24,9 @@ public class Garnishes extends CollectionService{
         return super.getAll(NAME);
     }
 
-    public void insert(Garnish garnish) {
+    public void insert(Garnish garnish){
         super.insert(garnish.getDocument());
     }
-
 
     public Garnish getbyKey(String name) {
         BaseDocument doc = collection.getDocument(name, BaseDocument.class);

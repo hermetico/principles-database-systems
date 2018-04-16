@@ -22,8 +22,7 @@ public class Gins extends CollectionService{
         return super.getAll(NAME);
     }
 
-
-    public void insert(Gin gin) {
+    public void insert(Gin gin){
         super.insert(gin.getDocument());
     }
 

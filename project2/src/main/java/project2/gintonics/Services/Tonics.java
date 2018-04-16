@@ -25,7 +25,7 @@ public class Tonics extends CollectionService{
         return super.getAll(NAME);
     }
 
-    public void insert(Tonic tonic) {
+    public void insert(Tonic tonic){
         super.insert(tonic.getDocument());
     }
 

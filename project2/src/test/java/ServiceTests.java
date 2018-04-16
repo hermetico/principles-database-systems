@@ -5,7 +5,9 @@ import org.junit.Test;
 
 import project2.gintonics.Entities.Combination;
 import project2.gintonics.DBService;
+import project2.gintonics.Entities.Garnish;
 import project2.gintonics.Entities.Gin;
+import project2.gintonics.Entities.Tonic;
 
 import java.io.File;
 
@@ -32,13 +34,27 @@ public class ServiceTests {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource(GINTONICS_FILE).getFile());
         Scanner scanner = new Scanner(file);
+
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             String[] parts = line.split(",");
-            Gin gin = new Gin(parts[0]);
 
-            Combination combination = new Combination(parts[0], parts[2], parts[3]);
-            combination.setKey(parts[4]);
+            Gin gin = new Gin(parts[0]);
+            Tonic tonic = new Tonic(parts[2]);
+            Garnish garnish = new Garnish(parts[3]);
+
+            if(!service.gins.exists(gin)){
+                service.gins.insert(gin);
+            }
+            if(!service.tonics.exists(tonic)){
+                service.tonics.insert(tonic);
+            }
+
+            if(!service.garnishes.exists(garnish)){
+                service.garnishes.insert(garnish);
+            }
+            Combination combination = new Combination(gin, tonic, garnish);
+            //combination.setKey(parts[4]);
             service.combinations.insert(combination);
         }
         scanner.close();
@@ -49,20 +65,22 @@ public class ServiceTests {
     public void testNumCombinations(){
         System.out.println("Testing num of current combinations");
         List<BaseDocument> documents = service.combinations.getAll();
-        System.out.println(documents.size());
         assertEquals(numCombinations,documents.size());
         System.out.println("Num of combinations = " + documents.size() + ", as expected");
     }
 
     @Test
     public void getCombination(){
-        System.out.println("Selecting combination num 37");
-        Combination combi = service.combinations.getByKey("37");
-        assertNotNull(combi);
-        System.out.println(combi);
+        List<BaseDocument> combinations = service.combinations.getAll();
+        Combination combi = new Combination(combinations.get(7));
 
-        System.out.println("Selecting combination num 999 which does not exist");
-        combi = service.combinations.getByKey("99");
+        System.out.println("Selecting combination with key: " + combi.getKey());
+        combi = service.combinations.getByKey(combi.getKey());
+        assertNotNull(combi);
+        System.out.println(combi.toString());
+
+        System.out.println("Selecting combination with key 'Wrong-key' which does not exist");
+        combi = service.combinations.getByKey("Wrong-key");
         assertNull(combi);
         System.out.println("It does not exist");
 
@@ -70,10 +88,12 @@ public class ServiceTests {
 
     @Test
     public void deleteCombination(){
-        System.out.println("Deleting combination num 37");
-        service.combinations.deleteByKey("37");
-        System.out.println("Selecting combination num 37, which should not exist anymore");
-        Combination combi = service.combinations.getByKey("37");
+        List<BaseDocument> combinations = service.combinations.getAll();
+        Combination combi = new Combination(combinations.get(7));
+        System.out.println("Deleting combination with key: " + combi.getKey());
+        service.combinations.deleteByKey(combi.getKey());
+        System.out.println("Selecting combination with key " + combi.getKey() + ", which should not exist anymore");
+        combi = service.combinations.getByKey(combi.getKey());
         assertNull(combi);
         System.out.println("It does not exist");
 
