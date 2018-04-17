@@ -22,6 +22,7 @@ public class Application {
     }
 
     public void inputLoop(){
+
         out.println("Nothing here yet");
     }
 

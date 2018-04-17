@@ -1,10 +1,7 @@
 package project2.gintonics;
 
 import com.arangodb.*;
-import project2.gintonics.Services.Combinations;
-import project2.gintonics.Services.Garnishes;
-import project2.gintonics.Services.Gins;
-import project2.gintonics.Services.Tonics;
+import project2.gintonics.Services.*;
 
 import java.io.PrintStream;
 
@@ -21,6 +18,8 @@ public class DBService{
     public Tonics tonics;
     public Garnishes garnishes;
     public Combinations combinations;
+    public Users users;
+    public Ratings ratings;
 
 
     public DBService(String host, String port, String user, String password){
@@ -36,10 +35,12 @@ public class DBService{
 
     public void init(){
         loadDB();
-        gins = new Gins(db);
-        tonics = new Tonics(db);
-        garnishes = new Garnishes(db);
-        combinations = new Combinations(db);
+        gins = new Gins(db, this);
+        tonics = new Tonics(db, this);
+        garnishes = new Garnishes(db, this);
+        combinations = new Combinations(db, this);
+        users = new Users(db, this);
+        ratings = new Ratings(db, this);
 
     }
 
@@ -60,6 +61,8 @@ public class DBService{
         tonics.resetCollection();
         garnishes.resetCollection();
         combinations.resetCollection();
+        //users.resetCollection();
+        //ratings.resetCollection();
     }
 
 

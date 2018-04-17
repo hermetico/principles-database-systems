@@ -3,11 +3,8 @@ import com.arangodb.entity.BaseDocument;
 import org.junit.Before;
 import org.junit.Test;
 
-import project2.gintonics.Entities.Combination;
+import project2.gintonics.Entities.*;
 import project2.gintonics.DBService;
-import project2.gintonics.Entities.Garnish;
-import project2.gintonics.Entities.Gin;
-import project2.gintonics.Entities.Tonic;
 
 import java.io.File;
 
@@ -96,6 +93,61 @@ public class ServiceTests {
         combi = service.combinations.getByKey(combi.getKey());
         assertNull(combi);
         System.out.println("It does not exist");
+
+
+    }
+
+    @Test
+    public void deleteGin(){
+        System.out.println("Deleting a gin");
+        List<BaseDocument> all = service.gins.getAll();
+        int total = all.size();
+        service.gins.delete(new Gin(all.get(1)));
+        assertEquals(service.gins.getAll().size(), total - 1);
+
+    }
+
+    @Test
+    public void deleteTonic() {
+        System.out.println("Deleting a tonic");
+        List<BaseDocument> all = service.tonics.getAll();
+        int total = all.size();
+        service.tonics.delete(new Tonic(all.get(1)));
+        assertEquals(service.tonics.getAll().size(), total - 1);
+    }
+
+    @Test
+    public void deleteGarnish() {
+        System.out.println("Deleting a garnish");
+        List<BaseDocument> all = service.garnishes.getAll();
+        int total = all.size();
+        service.garnishes.delete(new Garnish(all.get(1)));
+        assertEquals(service.garnishes.getAll().size(), total - 1);
+    }
+
+
+    @Test
+    public void createUser() {
+        System.out.println("Creating user Juan");
+        User user = new User("Juan");
+        System.out.println("Inserting it into DB");
+        service.users.insert(user);
+        System.out.println(user);
+
+    }
+
+    @Test
+    public void createRating(){
+        System.out.println("Creating rating");
+        Combination combi = new Combination(service.combinations.getAll().get(0));
+        if(service.users.getSize() == 0) createUser();
+        User user = new User(service.users.getAll().get(0));
+        String comment = "Really tasty";
+        int value = 9;
+        Rating rating = new Rating(combi, user, comment, value);
+        service.ratings.insert(rating);
+        System.out.println(rating);
+
 
 
     }

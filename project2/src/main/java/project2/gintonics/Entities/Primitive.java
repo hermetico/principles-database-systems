@@ -36,6 +36,9 @@ public abstract class Primitive {
         return getName();
     }
 
+    public void setKey(String key){
+        document.setKey(key);
+    }
     public BaseDocument getDocument() {
         return document;
     }

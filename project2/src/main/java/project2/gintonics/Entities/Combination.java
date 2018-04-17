@@ -23,7 +23,7 @@ public class Combination extends Primitive{
         super(gin + " " + tonic);
         document.addAttribute(GIN, gin.getName());
         document.addAttribute(TONIC, tonic.getName());
-        document.addAttribute(GARNISH, "");
+        document.addAttribute(GARNISH, null);
         document.addAttribute(AVG, 0f);
         document.addAttribute(RATINGS, 0);
 
@@ -80,7 +80,7 @@ public class Combination extends Primitive{
         String response = "";
         response += document.getAttribute(GIN) + " with " + document.getAttribute(TONIC);
 
-        if(!document.getAttribute(GARNISH).toString().equals("")) {
+        if(document.getAttribute(GARNISH) != null) {
             response += "\n\tgarnish: " + document.getAttribute(GARNISH);
         }
         response += "\n\taverage rating: " + document.getAttribute(AVG)

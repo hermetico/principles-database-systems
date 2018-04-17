@@ -3,16 +3,16 @@ package project2.gintonics.Services;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
+import project2.gintonics.DBService;
 import project2.gintonics.Entities.Combination;
 
 import java.util.List;
 
 public class Combinations extends CollectionService {
     private final String NAME = "combinations";
-    private ArangoCollection collection;
 
-    public Combinations(ArangoDatabase db) {
-        super(db);
+    public Combinations(ArangoDatabase db, DBService service) {
+        super(db, service);
         collection = collection(NAME);
     }
 
@@ -34,6 +34,10 @@ public class Combinations extends CollectionService {
             return null;
         }
         return new Combination(doc);
+    }
+
+    public void UpdateRatings(){
+
     }
 
 

@@ -3,16 +3,16 @@ package project2.gintonics.Services;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
+import project2.gintonics.DBService;
 import project2.gintonics.Entities.Garnish;
 
 import java.util.List;
 
 public class Garnishes extends CollectionService{
     private final String NAME = "garnishes";
-    private ArangoCollection collection;
 
-    public Garnishes(ArangoDatabase db) {
-        super(db);
+    public Garnishes(ArangoDatabase db, DBService service) {
+        super(db, service);
         collection = collection(NAME);
     }
 
@@ -20,7 +20,7 @@ public class Garnishes extends CollectionService{
         resetCollection(NAME);
     }
 
-    protected List<BaseDocument> getAll() {
+    public List<BaseDocument> getAll() {
         return super.getAll(NAME);
     }
 
