@@ -1,59 +1,55 @@
 package project2.gintonics.Services;
 
 
-import com.arangodb.ArangoCursor;
+
 import com.arangodb.ArangoDatabase;
-import com.arangodb.entity.BaseDocument;
-import com.arangodb.util.MapBuilder;
+import com.arangodb.entity.DocumentCreateEntity;
 import project2.gintonics.DBService;
+import project2.gintonics.Entities.MicroRating;
 import project2.gintonics.Entities.Rating;
+import project2.gintonics.Entities.User;
 
 
 import java.util.List;
-import java.util.Map;
 
 public class Ratings extends CollectionService {
-    private final String NAME = "ratings";
+    private static final String NAME = "ratings";
 
     public Ratings(ArangoDatabase db, DBService service) {
-        super(db, service);
-        collection = collection(NAME);
+        super(db, service, NAME);
     }
 
-    public void resetCollection(){
-        resetCollection(NAME);
+    public List<Rating> getAll() {
+        return super.getAll(Rating.class);
     }
-
-    public List<BaseDocument> getAll() {
-        return super.getAll(NAME);
-    }
-
-    public int getSize(){return super.getSize(NAME);}
 
     public void insert(Rating rating){
-        String ratingId  = String.valueOf(getSize(NAME) + 1);
-        rating.setKey(ratingId);
-        super.insert(rating.getDocument());
-        this.computeRatings(rating);
+        DocumentCreateEntity response = super.insert(rating);
+        rating.setKey(response.getKey());
+
+        // updating user microrating
+        //TODO move this somewhere else
+        MicroRating mr = new MicroRating(rating);
+        User user = service.users.getByKey(rating.getUserKey());
+        user.getMicroRatings().add(mr);
+        service.users.updateByKey(user.getKey(), user);
     }
 
-    public void computeRatings(Rating rating){
+    public void computeRatings(Rating rating) throws Exception {
         String query = "FOR r IN ratings " +
                 "Filter r.combination_key == @combinationkey " +
                 "COLLECT " +
                 "total = r.rating INTO total_ratings " +
                 "return {avg: average(total_ratings[*].r.rating)," +
                 "total: count(total_ratings[*].rating.rating)}";
-        Map<String, Object> bindVars = new MapBuilder().put("combinationkey", rating.getCombinationKey()).get();
-        BaseDocument doc = db.query(query, bindVars, null, BaseDocument.class).asListRemaining().get(0);
-        System.out.println(doc.getProperties());
+        //Map<String, Object> bindVars = new MapBuilder().put("combinationkey", rating.getCombinationKey()).get();
+        //BaseDocument doc = db.query(query, bindVars, null, BaseDocument.class).asListRemaining().get(0);
+        //System.out.println(doc.getProperties());
+
+        throw new Exception("Not implemented");
     }
     public Rating getByKey(String key) {
-        BaseDocument doc = collection.getDocument(key, BaseDocument.class);
-        if (doc == null ){
-            return null;
-        }
-        return new Rating(doc);
+        return super.getByKey(key, Rating.class);
     }
 
 

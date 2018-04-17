@@ -1,97 +1,79 @@
 package project2.gintonics.Entities;
 
-import com.arangodb.entity.BaseDocument;
+public class Combination extends Primitive {
+    private String gin;
+    private String tonic;
+    private String garnish;
+    private float avg;
+    private int numRatings;
 
-public class Combination extends Primitive{
-    private final String GIN = "gin";
-    private final String TONIC = "tonic";
-    private final String GARNISH = "garnish";
-    private final String AVG = "avg_rating";
-    private final String RATINGS = "ratings";
-
+    public Combination(){
+        super();
+    }
     public Combination(Gin gin, Tonic tonic, Garnish garnish){
-        super(gin + " " + tonic + " " + garnish);
-        document.addAttribute(GIN, gin.getName());
-        document.addAttribute(TONIC, tonic.getName());
-        document.addAttribute(GARNISH, garnish.getName());
-        document.addAttribute(AVG, 0f);
-        document.addAttribute(RATINGS, 0);
-
+        super(gin.getName() + " with " + tonic.getName() + " and " + garnish.getName());
+        this.gin = gin.getName();
+        this.tonic = tonic.getName();
+        this.garnish = garnish.getName();
+        this.avg = 0f;
+        this.numRatings = 0;
     }
 
     public Combination(Gin gin, Tonic tonic){
-        super(gin + " " + tonic);
-        document.addAttribute(GIN, gin.getName());
-        document.addAttribute(TONIC, tonic.getName());
-        document.addAttribute(GARNISH, null);
-        document.addAttribute(AVG, 0f);
-        document.addAttribute(RATINGS, 0);
+        super(gin.getName() + " with " + tonic.getName());
+        this.gin = gin.getName();
+        this.tonic = tonic.getName();
+        this.avg = 0f;
+        this.numRatings = 0;
 
     }
 
-    public Combination(BaseDocument document){
-        super(document);
-        this.document.addAttribute(GIN, document.getAttribute(GIN));
-        this.document.addAttribute(TONIC, document.getAttribute(TONIC));
-        this.document.addAttribute(GARNISH, document.getAttribute(GARNISH));
-        this.document.addAttribute(AVG, document.getAttribute(AVG));
-        this.document.addAttribute(RATINGS, document.getAttribute(RATINGS));
-        this.document.setKey(document.getKey());
-
+    public Combination(Combination other){
+        super(other);
+        this.gin = other.gin;
+        this.tonic = other.tonic;
+        this.garnish = other.garnish;
+        this.avg = other.avg;
+        this.numRatings = other.numRatings;
     }
 
-    public Gin getGin(){
-        return new Gin(document.getAttribute(GIN).toString());
+    public String getGin() {
+        return gin;
     }
 
-    public Tonic getTonic(){
-        return new Tonic(document.getAttribute(TONIC).toString());
+    public void setGin(String gin) {
+        this.gin = gin;
     }
 
-    public Garnish getGarnish(){
-        return new Garnish(document.getAttribute(GARNISH).toString());
+    public String getTonic() {
+        return tonic;
     }
 
-    public float getAverageRating(){
-        return (float) document.getAttribute(AVG);
+    public void setTonic(String tonic) {
+        this.tonic = tonic;
     }
 
-    public int getNumRatings(){
-        return (int) document.getAttribute(RATINGS);
+    public String getGarnish() {
+        return garnish;
     }
 
-    public String getKey(){
-        return (String) document.getKey();
+    public void setGarnish(String garnish) {
+        this.garnish = garnish;
     }
 
-    public void setGin(Gin gin){
-        document.addAttribute(GIN, gin.toString());
+    public float getAvg() {
+        return avg;
     }
 
-    public void setTonic(Tonic tonic){
-        document.addAttribute(TONIC, tonic.toString());
+    public void setAvg(float avg) {
+        this.avg = avg;
     }
 
-    public void setGarnish(Garnish garnish){
-        document.addAttribute(GARNISH, garnish.toString());
+    public int getNumRatings() {
+        return numRatings;
     }
 
-    public String toString() {
-        String response = "";
-        response += document.getAttribute(GIN) + " with " + document.getAttribute(TONIC);
-
-        if(document.getAttribute(GARNISH) != null) {
-            response += "\n\tgarnish: " + document.getAttribute(GARNISH);
-        }
-        response += "\n\taverage rating: " + document.getAttribute(AVG)
-                + "\n\tnum rating: " + document.getAttribute(RATINGS)
-                + "\n\tkey: " + document.getKey();
-        return response;
+    public void setNumRatings(int numRatings) {
+        this.numRatings = numRatings;
     }
-
-    public BaseDocument getDocument(){
-        return document;
-    }
-
-
 }

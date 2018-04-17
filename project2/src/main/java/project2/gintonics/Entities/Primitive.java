@@ -1,45 +1,44 @@
 package project2.gintonics.Entities;
+import com.arangodb.entity.DocumentField.Type;
 
-import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.DocumentField;
 
 public abstract class Primitive {
-    protected BaseDocument document;
-    protected final String NAME = "name";
 
-    public Primitive(BaseDocument document){
-        this.document = new BaseDocument();
-        this.document.addAttribute(NAME, document.getAttribute(NAME));
-        this.document.setKey(document.getKey());
+    @DocumentField(Type.KEY)
+    protected String key;
+    protected String name;
+
+    public Primitive(){
+        super();
+    }
+
+    public Primitive(Primitive other){
+        this.key = other.key;
+        this.name = other.name;
 
     }
 
     public Primitive(String name){
-        this.document = new BaseDocument();
-        this.document.addAttribute(NAME, name);
-        this.document.setKey(name.replace(" ", "-"));
-
+        this.name = name;
     }
 
-    public void setName(String name){
-        this.document.addAttribute(NAME, name);
-        this.document.setKey(name.replace(" ", "-"));
+    public String getKey() {
+        return key;
     }
 
-    public String getName(){
-        return (String) document.getAttribute(NAME);
+    public String getName() {
+        return name;
     }
 
-    public String getKey(){
-        return document.getKey();
-    }
-    public String toString(){
-        return getName();
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public void setKey(String key){
-        document.setKey(key);
+    public void setName(String name) {
+        this.name = name;
     }
-    public BaseDocument getDocument() {
-        return document;
-    }
+
+    public String prettyPrint(){return name;}
 }
+

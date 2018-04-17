@@ -4,53 +4,56 @@ import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDBException;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
-import com.arangodb.entity.CollectionEntity;
+import com.arangodb.entity.DocumentCreateEntity;
+import com.arangodb.util.MapBuilder;
 import project2.gintonics.DBService;
-import project2.gintonics.Entities.Primitive;
 import project2.gintonics.Services.Ifaces.ICommon;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
 
-public class CollectionService  implements ICommon {
+public class CollectionService implements ICommon {
+    private String _CNAME;
     protected ArangoDatabase db;
     protected ArangoCollection collection;
     protected DBService service;
+
     private PrintStream out = System.out;
     private PrintStream err = System.err;
 
-    public CollectionService(ArangoDatabase db, DBService service){
+    public CollectionService(ArangoDatabase db, DBService service, String name){
         this.service = service;
         this.db = db;
+        this._CNAME = name;
+        collection = loadCollection(_CNAME);
     }
 
 
-    protected ArangoCollection collection(String collectionName){
-        ArangoCollection collection;
+    private ArangoCollection loadCollection(String collectionName){
         try {
             collection = db.collection(collectionName);
             collection.load();
         }catch(ArangoDBException e){
             //If collection does not exist, fails silently
             out.println("Warning, collection "+ collectionName +" did not exist, created.");
-            createCollection(collectionName);
-            collection = db.collection(collectionName);
+            createAndLoadCollection(collectionName);
 
         }
         return collection;
     }
 
-    protected void createCollection(String collectionName) {
+    private void createAndLoadCollection(String collectionName) {
 
         try {
             db.createCollection(collectionName);
         } catch (ArangoDBException e) {
             err.println("Failed to create collection: " + collectionName + "; " + e.getMessage());
         }
-        collection = collection(collectionName);
+        collection = loadCollection(collectionName);
     }
 
-    protected void removeCollection(String collectionName){
+    private void removeCollection(String collectionName){
         try {
             db.collection(collectionName).drop();
         } catch (ArangoDBException e) {
@@ -59,19 +62,20 @@ public class CollectionService  implements ICommon {
         collection = null;
     }
 
-    protected void resetCollection(String collectionName){
-        removeCollection(collectionName);
-        createCollection(collectionName);
-        collection = collection(collectionName);
+    public void resetCollection(){
+        removeCollection(_CNAME);
+        createAndLoadCollection(_CNAME);
     }
 
-    public List<BaseDocument> getAll(String collectionName) {
-        String query = "FOR t IN " + collectionName + " RETURN t";
-        return db.query(query, null, null, BaseDocument.class).asListRemaining();
+    @Override
+    public <T> List<T> getAll(Class<T> asType) {
+        String query = "FOR t IN " + _CNAME + " RETURN t";
+        return db.query(query, null, null, asType).asListRemaining();
     }
 
-    public int getSize(String collectionName) {
-        String query = "FOR t IN " + collectionName + " COLLECT WITH COUNT INTO number RETURN {total:number}";
+    @Override
+    public int getSize() {
+        String query = "FOR t IN " + _CNAME + " COLLECT WITH COUNT INTO number RETURN {total:number}";
         String size = db.query(query, null, null, BaseDocument.class)
                 .asListRemaining()
                 .get(0)
@@ -81,18 +85,22 @@ public class CollectionService  implements ICommon {
     }
 
     @Override
-    public boolean exists(Primitive primitive) {
-        return collection.getDocument(primitive.getKey(), BaseDocument.class) != null;
-    }
-
-    @Override
-    public boolean existsByKey(String key) {
+    public boolean exists(String key) {
         return collection.getDocument(key, BaseDocument.class) != null;
     }
 
     @Override
-    public void delete(Primitive primitive) {
-        collection.deleteDocument(primitive.getKey());
+    public boolean existsByName(String name) {
+        String query = "FOR t IN " + _CNAME+ " FILTER t.name == @name return t";
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("name", name)
+                .get();
+        return db.query(query, bindVars, null, BaseDocument.class).asListRemaining().size() != 0;
+    }
+
+    @Override
+    public void delete(String key) {
+        collection.deleteDocument(key);
     }
 
     @Override
@@ -100,9 +108,18 @@ public class CollectionService  implements ICommon {
         collection.deleteDocument(key);
     }
 
+    @Override
+    public <T> T getByKey(String key,  Class<T> asType) {
+        return collection.getDocument(key, asType);
+    }
 
     @Override
-    public void insert(BaseDocument document) {
-        collection.insertDocument(document);
+    public <T> DocumentCreateEntity insert(T obj) {
+        return collection.insertDocument(obj);
+    }
+
+    @Override
+    public <T> void updateByKey(String key, T obj) {
+        collection.updateDocument(key, obj);
     }
 }

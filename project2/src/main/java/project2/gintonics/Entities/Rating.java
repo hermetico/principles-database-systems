@@ -1,72 +1,69 @@
 package project2.gintonics.Entities;
 
-import com.arangodb.entity.BaseDocument;
+public class Rating extends Primitive {
+    private String userKey;
+    private String userName;
+    private String comments;
+    private int ratingValue;
+    private int helpfulCount;
 
-import java.util.ArrayList;
+    public Rating(){
+        super();
+    }
 
-public class Rating extends Primitive{
-    private final String COMBINATIONKEY = "combination_key";
-    private final String USERKEY = "user_key";
-    private final String USERNAME = "user_name";
-    private final String COMMENT = "comment";
-    private final String RATING = "rating";
-    private final String HELPFUL = "helpful";
-
-    public Rating(Combination combination, User user, String comment, int rating){
+    public Rating(Combination combination, User user, String comments, int ratingValue){
         super(combination.getName());
-        document.setKey(null);
-        document.addAttribute(COMBINATIONKEY, combination.getKey());
-        document.addAttribute(USERKEY, user.getKey());
-        document.addAttribute(USERNAME, user.getName());
-        document.addAttribute(COMMENT, comment);
-        document.addAttribute(RATING, rating);
-        document.addAttribute(HELPFUL, 0);
-
+        userKey = user.getKey();
+        userName = user.getName();
+        this.comments = comments;
+        this.ratingValue = ratingValue;
+        this.helpfulCount = 0;
     }
 
-
-    public Rating(BaseDocument document){
-        super(document);
-        this.document.addAttribute(COMBINATIONKEY, document.getAttribute(COMBINATIONKEY));
-        this.document.addAttribute(USERKEY, document.getAttribute(USERKEY));
-        this.document.addAttribute(USERNAME, document.getAttribute(USERNAME));
-        this.document.addAttribute(COMMENT, document.getAttribute(COMMENT));
-        this.document.addAttribute(RATING, document.getAttribute(RATING));
-        this.document.addAttribute(HELPFUL, document.getAttribute(HELPFUL));
+    public String getUserKey() {
+        return userKey;
     }
 
-
-    public String getKey(){
-        return (String) document.getKey();
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
     }
 
-
-    public String getUserKey(){
-        return document.getAttribute(USERKEY).toString();
-    }
-    public String getCombinationKey(){
-        return document.getAttribute(COMBINATIONKEY).toString();
+    public String getUserName() {
+        return userName;
     }
 
-    public String getUserName(){
-        return document.getAttribute(USERNAME).toString();
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public String toString() {
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public int getRatingValue() {
+        return ratingValue;
+    }
+
+    public void setRatingValue(int ratingValue) {
+        this.ratingValue = ratingValue;
+    }
+
+    public int getHelpfulCount() {
+        return helpfulCount;
+    }
+
+    public void setHelpfulCount(int helpfulCount) {
+        this.helpfulCount = helpfulCount;
+    }
+    public String prettyPrint(){
         String response = "";
-        response += "Rating by: " + document.getAttribute(USERNAME);
-        response += "\n\tTotal: " + document.getAttribute(RATING);
-        response += "\n\tComment: "+ document.getAttribute(COMMENT);
-        response += "\n\tCombination_key: "+ document.getAttribute(COMBINATIONKEY);
-        response += "\n\tUser_key: "+ document.getAttribute(USERKEY);
-        response += "\n\tHelpful: "+ document.getAttribute(HELPFUL);
-        response += "\n\tkey: "+ document.getKey();
+        response += "key: "+ key + "\n\tname: " + name;
+        response += "\n\tuserKey: " + userKey +"\n\tuserName: " + userName;
+        response += "\n\tvalue: " + ratingValue + "\n\thelpfulCount: " + helpfulCount;
         return response;
     }
-
-    public BaseDocument getDocument(){
-        return document;
-    }
-
-
 }

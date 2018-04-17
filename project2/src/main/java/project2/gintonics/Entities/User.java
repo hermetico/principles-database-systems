@@ -1,43 +1,39 @@
 package project2.gintonics.Entities;
 
-import com.arangodb.entity.BaseDocument;
-
 import java.util.ArrayList;
+import java.util.List;
 
-public class User extends Primitive{
-    private final String RATINGS = "ratings";
+public class User extends Primitive {
+    private List<MicroRating> microRatings;
+
+    public User(){
+        super();
+    }
 
     public User(String name){
         super(name);
-        document.setKey(null);
-        document.addAttribute(RATINGS, new ArrayList<BaseDocument>());
-
+        microRatings = new ArrayList<MicroRating>();
     }
 
-
-    public User(BaseDocument document){
-        super(document);
-        document.addAttribute(RATINGS, document.getAttribute(RATINGS));
-
-
+    public List<MicroRating> getMicroRatings() {
+        return microRatings;
     }
 
-
-    public String getKey(){
-        return (String) document.getKey();
+    public void setMicroRatings(List<MicroRating> microRatings) {
+        this.microRatings = microRatings;
     }
 
-
-    public String toString() {
+    public String prettyPrint(){
         String response = "";
-        response += document.getAttribute(NAME);
-        response +="\n\tkey: " + document.getKey();
+        response += name;
+        if(microRatings.size() > 0){
+            response += "\n\tMicroratings:";
+            for(MicroRating mr: microRatings){
+                response += "\n\t" + mr.prettyPrint();
+            }
+
+        }
+
         return response;
     }
-
-    public BaseDocument getDocument(){
-        return document;
-    }
-
-
 }

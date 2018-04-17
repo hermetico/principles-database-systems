@@ -1,43 +1,30 @@
 package project2.gintonics.Services;
 
-import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDatabase;
-import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.DocumentCreateEntity;
 import project2.gintonics.DBService;
 import project2.gintonics.Entities.Combination;
 
 import java.util.List;
 
 public class Combinations extends CollectionService {
-    private final String NAME = "combinations";
+    private static final String NAME = "combinations";
 
     public Combinations(ArangoDatabase db, DBService service) {
-        super(db, service);
-        collection = collection(NAME);
+        super(db, service, NAME);
     }
 
-    public void resetCollection(){
-        resetCollection(NAME);
-    }
-
-    public List<BaseDocument> getAll() {
-        return super.getAll(NAME);
+    public List<Combination> getAll() {
+        return super.getAll(Combination.class);
     }
 
     public void insert(Combination combination){
-        super.insert(combination.getDocument());
+        DocumentCreateEntity response = super.insert(combination);
+        combination.setKey(response.getKey());
     }
 
     public Combination getByKey(String key) {
-        BaseDocument doc = collection.getDocument(key, BaseDocument.class);
-        if (doc == null ){
-            return null;
-        }
-        return new Combination(doc);
-    }
-
-    public void UpdateRatings(){
-
+        return super.getByKey(key, Combination.class);
     }
 
 

@@ -1,16 +1,16 @@
 package project2.gintonics.Services.Ifaces;
-
-import com.arangodb.entity.BaseDocument;
-import project2.gintonics.Entities.Primitive;
+import com.arangodb.entity.DocumentCreateEntity;
 
 import java.util.List;
 
 public interface ICommon {
-    boolean exists(Primitive primitive);
-    boolean existsByKey(String key);
-    List<BaseDocument> getAll(String collectionName);
-    int getSize(String collectionName);
-    void delete(Primitive primitive);
+    boolean exists(String key);
+    boolean existsByName(String name);
+    <T> List<T> getAll(Class<T> asType);
+    int getSize();
+    void delete(String key);
     void deleteByKey(String key);
-    void insert(BaseDocument document);
+    <T> T getByKey(String key, Class<T> asType);
+    <T> DocumentCreateEntity insert(T obj);
+    <T> void updateByKey(String key, T obj);
 }
