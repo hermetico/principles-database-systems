@@ -46,14 +46,27 @@ public class DBService{
 
     private void loadDB(){
         try{
-            arango.db(DBNAME);
+            db = arango.db(DBNAME);
+            db.getInfo();
         }catch(ArangoDBException e){
             //If db does not exist, fails silently
-            out.println("Warning, database did not exist, created.");
-            arango.createDatabase(DBNAME);
+            err.println("Warning, database did not exist, creating it.");
+            db = createDB(DBNAME);
 
         }
-        db = arango.db(DBNAME);
+
+    }
+
+    private ArangoDatabase createDB(String dbName){
+        try{
+            arango.createDatabase(dbName);
+            return arango.db(dbName);
+        }catch(ArangoDBException e){
+            //If db does not exist, fails silently
+            err.println("Unable to create the database " + dbName);
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void resetCollections(){

@@ -23,6 +23,11 @@ public class ServiceTests {
 
     @Before
     public void setUp() throws Exception {
+        Combination combination;
+        Gin gin;
+        Tonic tonic;
+        Garnish garnish;
+
         service  = new DBService(HOST, PORT, USER, PASSWORD);
         service.init();
         service.resetCollections();
@@ -33,12 +38,15 @@ public class ServiceTests {
 
         while (scanner.hasNextLine()) {
             numCombinations++;
+            gin = null; tonic = null; garnish = null;
             String line = scanner.nextLine();
             String[] parts = line.split(",");
 
-            Gin gin = new Gin(parts[0]);
-            Tonic tonic = new Tonic(parts[2]);
-            Garnish garnish = new Garnish(parts[3]);
+
+            gin = new Gin(parts[0]);
+            tonic = new Tonic(parts[2]);
+
+
 
 
             if(!service.gins.existsByName(gin.getName())){
@@ -49,11 +57,20 @@ public class ServiceTests {
                 service.tonics.insert(tonic);
             }
 
-            if(!service.garnishes.existsByName(garnish.getName())){
-                service.garnishes.insert(garnish);
+            if(parts.length > 4) {
+                garnish = new Garnish(parts[3]);
+                if(!service.garnishes.existsByName(garnish.getName())){
+                    service.garnishes.insert(garnish);
+                }
             }
 
-            Combination combination = new Combination(gin, tonic, garnish);
+
+            if(garnish == null){
+                 combination = new Combination(gin, tonic);
+            }else{
+                combination = new Combination(gin, tonic, garnish);
+            }
+
             service.combinations.insert(combination);
         }
         scanner.close();
@@ -61,7 +78,12 @@ public class ServiceTests {
     }
 
     @Test
-    public void testNumCombinations(){
+    public void printAndCountCombinations(){
+        System.out.println("Printing all combinations");
+        List<Combination> combinations = service.combinations.getAll();
+        for(Combination combination: combinations){
+            System.out.println(combination.prettyPrint());
+        }
         System.out.println("Testing num of current combinations");
         int size = service.combinations.getSize();
         assertEquals(numCombinations,size);

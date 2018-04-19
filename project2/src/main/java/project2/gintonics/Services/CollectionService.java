@@ -36,7 +36,7 @@ public class CollectionService implements ICommon {
             collection.load();
         }catch(ArangoDBException e){
             //If collection does not exist, fails silently
-            out.println("Warning, collection "+ collectionName +" did not exist, created.");
+            err.println("Warning, collection "+ collectionName +" did not exist, created.");
             createAndLoadCollection(collectionName);
 
         }
@@ -57,7 +57,7 @@ public class CollectionService implements ICommon {
         try {
             db.collection(collectionName).drop();
         } catch (ArangoDBException e) {
-            out.println("Collection " + collectionName + "did not exist");
+            err.println("Collection " + collectionName + "did not exist");
         }
         collection = null;
     }
