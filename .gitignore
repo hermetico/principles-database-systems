@@ -27,3 +27,6 @@ project-1/project-1.iml
 !project-1/libs/*.jar
 
 *.minibase
+
+# project2
+project2/.idea/
