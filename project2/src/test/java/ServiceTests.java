@@ -140,7 +140,7 @@ public class ServiceTests {
     @Test
     public void createRatingAndMicroRating(){
         System.out.println("Creating rating");
-        Combination combi = new Combination(service.combinations.getAll().get(0));
+        Combination combi = service.combinations.getAll().get(0);
         if(service.users.getSize() == 0) createUser();
         User user = service.users.getAll().get(0);
         String comment = "Really tasty";
@@ -152,7 +152,5 @@ public class ServiceTests {
 
         user = service.users.getByKey(user.getKey());
         System.out.println(user.prettyPrint());
-
-
     }
 }

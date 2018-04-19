@@ -10,6 +10,7 @@ public class Combination extends Primitive {
     public Combination(){
         super();
     }
+
     public Combination(Gin gin, Tonic tonic, Garnish garnish){
         super(gin.getName() + " with " + tonic.getName() + " and " + garnish.getName());
         this.gin = gin.getName();
@@ -75,5 +76,19 @@ public class Combination extends Primitive {
 
     public void setNumRatings(int numRatings) {
         this.numRatings = numRatings;
+    }
+
+    public String prettyPrint(){
+        StringBuilder response =  new StringBuilder();
+        response.append("Combination: " + name);
+        response.append("\n\tid:" + key);
+        response.append("\n\tgin:" + gin);
+        response.append("\n\ttonic:" + tonic);
+        if(garnish != null)
+            response.append("\n\tgarnish:" + garnish);
+        response.append("\n\tAverage rating:" + avg);
+        response.append("\n\tNum rating:" + numRatings);
+
+        return response.toString();
     }
 }

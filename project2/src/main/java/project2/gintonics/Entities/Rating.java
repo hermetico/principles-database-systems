@@ -13,8 +13,8 @@ public class Rating extends Primitive {
 
     public Rating(Combination combination, User user, String comments, int ratingValue){
         super(combination.getName());
-        userKey = user.getKey();
-        userName = user.getName();
+        this.userKey = user.getKey();
+        this.userName = user.getName();
         this.comments = comments;
         this.ratingValue = ratingValue;
         this.helpfulCount = 0;
@@ -59,11 +59,15 @@ public class Rating extends Primitive {
     public void setHelpfulCount(int helpfulCount) {
         this.helpfulCount = helpfulCount;
     }
+
     public String prettyPrint(){
-        String response = "";
-        response += "key: "+ key + "\n\tname: " + name;
-        response += "\n\tuserKey: " + userKey +"\n\tuserName: " + userName;
-        response += "\n\tvalue: " + ratingValue + "\n\thelpfulCount: " + helpfulCount;
-        return response;
+        StringBuilder response = new StringBuilder();
+        response.append("Rating: "  + name);
+        response.append("\n\tkey: "  + key);
+        response.append("\n\tuserName: "  + userName);
+        response.append("\n\tuserKey: "  + userKey);
+        response.append("\n\tratingValue: "  + ratingValue);
+        response.append("\n\tcomments: "  + comments);
+        return response.toString();
     }
 }

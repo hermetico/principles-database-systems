@@ -1,6 +1,5 @@
 package project2.gintonics.Entities;
 import com.arangodb.entity.DocumentField.Type;
-
 import com.arangodb.entity.DocumentField;
 
 public abstract class Primitive {
@@ -16,7 +15,6 @@ public abstract class Primitive {
     public Primitive(Primitive other){
         this.key = other.key;
         this.name = other.name;
-
     }
 
     public Primitive(String name){

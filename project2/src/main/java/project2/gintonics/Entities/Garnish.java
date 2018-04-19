@@ -11,8 +11,8 @@ public class Garnish extends Primitive {
 
     }
 
-    public Garnish(String garnish){
-        super(garnish);
+    public Garnish(String name){
+        super(name);
 
     }
 }

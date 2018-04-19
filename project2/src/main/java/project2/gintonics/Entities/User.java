@@ -24,16 +24,14 @@ public class User extends Primitive {
     }
 
     public String prettyPrint(){
-        String response = "";
-        response += name;
+        StringBuilder response = new StringBuilder();
+        response.append(name);
         if(microRatings.size() > 0){
-            response += "\n\tMicroratings:";
+            response.append("\n\tMicroRatings:");
             for(MicroRating mr: microRatings){
-                response += "\n\t" + mr.prettyPrint();
+                response.append("\n\t" + mr.prettyPrint());
             }
-
         }
-
-        return response;
+        return response.toString();
     }
 }

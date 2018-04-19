@@ -12,7 +12,6 @@ public class Tonic extends Primitive {
 
     public Tonic(String name){
         super(name);
-
     }
 
 }

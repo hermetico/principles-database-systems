@@ -8,12 +8,10 @@ public class Gin extends Primitive{
 
     public Gin(Gin other){
         super(other);
-
     }
 
     public Gin(String name){
         super(name);
-
     }
 
 }
