@@ -19,7 +19,7 @@ public class ServiceTests {
     private final String PASSWORD = "1234";
     private final String GINTONICS_FILE = "gintonics.csv";
     DBService service;
-    int numCombinations = 44;
+    int numCombinations = 0;
 
     @Before
     public void setUp() throws Exception {
@@ -32,6 +32,7 @@ public class ServiceTests {
         Scanner scanner = new Scanner(file);
 
         while (scanner.hasNextLine()) {
+            numCombinations++;
             String line = scanner.nextLine();
             String[] parts = line.split(",");
 
