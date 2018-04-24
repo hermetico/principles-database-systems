@@ -1,5 +1,7 @@
 package project2.gintonics.Entities;
 
+import project2.gintonics.Utils.Utils;
+
 public class Tonic extends Primitive {
 
     public Tonic(){
@@ -12,6 +14,7 @@ public class Tonic extends Primitive {
 
     public Tonic(String name){
         super(name);
+        this.key  = Utils.getKeyFromName(name);
     }
 
 }

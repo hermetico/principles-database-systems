@@ -21,7 +21,7 @@ public class Tonics extends CollectionService{
 
     public void insert(Tonic tonic){
         DocumentCreateEntity response = super.insert(tonic);
-        tonic.setKey(response.getKey());
+        //tonic.setKey(response.getKey());
     }
 
     public Tonic getByKey(String key) {

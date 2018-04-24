@@ -20,7 +20,7 @@ public class Gins extends CollectionService{
 
     public void insert(Gin gin){
         DocumentCreateEntity response = super.insert(gin);
-        gin.setKey(response.getKey());
+        //gin.setKey(response.getKey());
     }
 
     public Gin getByKey(String key) {

@@ -20,7 +20,7 @@ public class Garnishes extends CollectionService{
 
     public void insert(Garnish garnish){
         DocumentCreateEntity response = super.insert(garnish);
-        garnish.setKey(response.getKey());
+        //garnish.setKey(response.getKey());
     }
 
     public Garnish getbyKey(String key) {
