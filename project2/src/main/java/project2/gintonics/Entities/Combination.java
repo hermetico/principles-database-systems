@@ -4,7 +4,7 @@ public class Combination extends Primitive {
     private String gin;
     private String tonic;
     private String garnish;
-    private float avg;
+    private float avgRating;
     private int numRatings;
 
     public Combination(){
@@ -16,7 +16,7 @@ public class Combination extends Primitive {
         this.gin = gin.getName();
         this.tonic = tonic.getName();
         this.garnish = garnish.getName();
-        this.avg = 0f;
+        this.avgRating = 0f;
         this.numRatings = 0;
     }
 
@@ -24,7 +24,7 @@ public class Combination extends Primitive {
         super(gin.getName() + " with " + tonic.getName());
         this.gin = gin.getName();
         this.tonic = tonic.getName();
-        this.avg = 0f;
+        this.avgRating = 0f;
         this.numRatings = 0;
 
     }
@@ -34,7 +34,7 @@ public class Combination extends Primitive {
         this.gin = other.gin;
         this.tonic = other.tonic;
         this.garnish = other.garnish;
-        this.avg = other.avg;
+        this.avgRating = other.avgRating;
         this.numRatings = other.numRatings;
     }
 
@@ -62,12 +62,12 @@ public class Combination extends Primitive {
         this.garnish = garnish;
     }
 
-    public float getAvg() {
-        return avg;
+    public float getAvgRating() {
+        return avgRating;
     }
 
-    public void setAvg(float avg) {
-        this.avg = avg;
+    public void setAvgRating(float avgRating) {
+        this.avgRating = avgRating;
     }
 
     public int getNumRatings() {
@@ -86,7 +86,7 @@ public class Combination extends Primitive {
         response.append("\n\ttonic:" + tonic);
         if(garnish != null)
             response.append("\n\tgarnish:" + garnish);
-        response.append("\n\tAverage rating:" + avg);
+        response.append("\n\tAverage rating:" + avgRating);
         response.append("\n\tNum rating:" + numRatings);
 
         return response.toString();
