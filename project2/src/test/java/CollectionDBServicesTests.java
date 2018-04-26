@@ -27,6 +27,7 @@ public class CollectionDBServicesTests {
         db = new DB(HOST, PORT, USER, PASSWORD);
         db.init();
         db.resetCollections();
+        fillDB();
 
     }
 
