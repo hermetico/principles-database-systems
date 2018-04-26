@@ -23,6 +23,7 @@ public interface IDBServices {
     int getNumCombinations();
     List<Combination> getAllCombinations();
     void insertCombination(Combination combination);
+    Combination getCombinationByKey(String key);
 
     // users
     int getNumUsers();
@@ -31,5 +32,9 @@ public interface IDBServices {
 
     // ratings
     Rating rateCombination(Combination combination, User user, String comment, int value);
+    List<CombinationRatingsQuery> getRatingsByGinAndTonic(Gin gin, Tonic tonic);
+    List<CombinationRatingsQuery> getRatingsByGinAndTonicAndGarnish(Gin gin, Tonic tonic, Garnish garnish);
+    List<CombinationRatingsQuery> getRatingsByGinAndTonic(Gin gin, Tonic tonic, int page);
+    List<CombinationRatingsQuery> getRatingsByGinAndTonicAndGarnish(Gin gin, Tonic tonic, Garnish garnish, int page);
 
 }

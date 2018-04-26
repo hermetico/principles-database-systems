@@ -1,5 +1,7 @@
 package project2.gintonics.Entities;
 
+import java.util.List;
+
 public class Rating extends Primitive {
     private String combinationKey;
     private String userKey;
@@ -69,6 +71,10 @@ public class Rating extends Primitive {
     public void setHelpfulCount(int helpfulCount) {
         this.helpfulCount = helpfulCount;
     }
+
+    /*public List<Rating> getByGin(){
+
+    }*/
 
     public String prettyPrint(){
         StringBuilder response = new StringBuilder();

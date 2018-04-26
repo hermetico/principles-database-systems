@@ -1,9 +1,12 @@
 package project2.gintonics;
 
+import com.arangodb.entity.BaseDocument;
+import com.arangodb.util.MapBuilder;
 import project2.gintonics.CollectionServices.*;
 import project2.gintonics.Entities.*;
 
 import java.util.List;
+import java.util.Map;
 
 public class DBServices implements IDBServices {
 
@@ -91,6 +94,11 @@ public class DBServices implements IDBServices {
     }
 
     @Override
+    public Combination getCombinationByKey(String key) {
+        return null;
+    }
+
+    @Override
     public int getNumUsers(){
         return users.getSize();
     }
@@ -123,11 +131,50 @@ public class DBServices implements IDBServices {
         user.insertMicroRating(mr);
         users.update(user);
 
-        // we compute the new average based on the runi
         combination.updateMovingAverage(ratingValue);
         combinations.update(combination);
         return rating;
 
+    }
+
+
+    @Override
+    public List<CombinationRatingsQuery> getRatingsByGinAndTonic(Gin gin, Tonic tonic) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR c IN " + combinations.getCollectionName() + "\n");
+        builder.append("FILTER c.gin == @gin\n");
+        builder.append("FILTER c.tonic == @tonic\n");
+        builder.append("RETURN {\n");
+            builder.append("combination: c");
+            builder.append("combinationRatings: (");
+                builder.append("FOR r IN " + ratings.getCollectionName() + "\n");
+                builder.append("FILTER r.combinationKey == c._key\n");
+                builder.append("RETURN r\n");
+            builder.append(")\n");
+        builder.append("}");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("gin", gin.getName())
+                .put("tonic", tonic.getName())
+                .get();
+        //return db.conn.query(query, bindVars, null, BaseDocument.class).asListRemaining().size() != 0;
+        return null;
+    }
+
+    @Override
+    public List<CombinationRatingsQuery> getRatingsByGinAndTonicAndGarnish(Gin gin, Tonic tonic, Garnish garnish) {
+        return null;
+    }
+
+    @Override
+    public List<CombinationRatingsQuery> getRatingsByGinAndTonic(Gin gin, Tonic tonic, int page) {
+        return null;
+    }
+
+    @Override
+    public List<CombinationRatingsQuery> getRatingsByGinAndTonicAndGarnish(Gin gin, Tonic tonic, Garnish garnish, int page) {
+        return null;
     }
 
 

@@ -112,7 +112,13 @@ public class CollectionService implements ICollectionService {
         return collection.insertDocument(obj);
     }
 
+    @Override
+    public String getCollectionName() {
+        return _CNAME;
+    }
+
     protected <T> void updateByKey(String key, T obj) {
         collection.updateDocument(key, obj);
     }
+
 }

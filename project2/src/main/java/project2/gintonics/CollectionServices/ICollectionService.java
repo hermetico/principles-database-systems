@@ -12,4 +12,5 @@ public interface ICollectionService {
     void deleteByKey(String key);
     <T> T getByKey(String key, Class<T> asType);
     <T> DocumentCreateEntity insert(T obj);
+    String getCollectionName();
 }
