@@ -1,6 +1,6 @@
 package project2;
 
-import project2.gintonics.DBService;
+import project2.gintonics.DB;
 import java.io.*;
 
 public class Application {
@@ -13,10 +13,10 @@ public class Application {
     private PrintStream out = System.out;
     private PrintStream err = System.err;
 
-    private DBService service;
+    private DB service;
 
     public void runApplication(){
-        service = new DBService(HOST, PORT, USER, PASSWORD);
+        service = new DB(HOST, PORT, USER, PASSWORD);
         service.init();
         inputLoop();
     }

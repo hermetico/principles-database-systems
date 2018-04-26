@@ -1,4 +1,4 @@
-package project2.gintonics.Services;
+package project2.gintonics.CollectionServices;
 
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDBException;
@@ -6,24 +6,18 @@ import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.DocumentCreateEntity;
 import com.arangodb.util.MapBuilder;
-import project2.gintonics.DBService;
-import project2.gintonics.Services.Ifaces.ICommon;
-
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
-public class CollectionService implements ICommon {
+public class CollectionService implements ICollectionService {
     private String _CNAME;
     protected ArangoDatabase db;
     protected ArangoCollection collection;
-    protected DBService service;
-
     private PrintStream out = System.out;
     private PrintStream err = System.err;
 
-    public CollectionService(ArangoDatabase db, DBService service, String name){
-        this.service = service;
+    public CollectionService(ArangoDatabase db, String name){
         this.db = db;
         this._CNAME = name;
         collection = loadCollection(_CNAME);
@@ -118,8 +112,7 @@ public class CollectionService implements ICommon {
         return collection.insertDocument(obj);
     }
 
-    @Override
-    public <T> void updateByKey(String key, T obj) {
+    protected <T> void updateByKey(String key, T obj) {
         collection.updateDocument(key, obj);
     }
 }

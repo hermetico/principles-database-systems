@@ -1,6 +1,7 @@
 package project2.gintonics.Entities;
 
 public class Rating extends Primitive {
+    private String combinationKey;
     private String userKey;
     private String userName;
     private String comments;
@@ -13,11 +14,20 @@ public class Rating extends Primitive {
 
     public Rating(Combination combination, User user, String comments, int ratingValue){
         super(combination.getName());
+        this.combinationKey = combination.getKey();
         this.userKey = user.getKey();
         this.userName = user.getName();
         this.comments = comments;
         this.ratingValue = ratingValue;
         this.helpfulCount = 0;
+    }
+
+    public String getCombinationKey() {
+        return combinationKey;
+    }
+
+    public void setCombinationKey(String combinationKey) {
+        this.combinationKey = combinationKey;
     }
 
     public String getUserKey() {
@@ -64,6 +74,7 @@ public class Rating extends Primitive {
         StringBuilder response = new StringBuilder();
         response.append("Rating: "  + name);
         response.append("\n\tkey: "  + key);
+        response.append("\n\tcombinationKey: "  + combinationKey);
         response.append("\n\tuserName: "  + userName);
         response.append("\n\tuserKey: "  + userKey);
         response.append("\n\tratingValue: "  + ratingValue);

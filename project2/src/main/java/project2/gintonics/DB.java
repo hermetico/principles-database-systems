@@ -1,12 +1,12 @@
 package project2.gintonics;
 
 import com.arangodb.*;
-import project2.gintonics.Services.*;
+import project2.gintonics.CollectionServices.*;
 
 import java.io.PrintStream;
 
 
-public class DBService{
+public class DB {
     private final String DBNAME = "gins-tonics";
 
     private PrintStream out = System.out;
@@ -22,26 +22,27 @@ public class DBService{
     public Ratings ratings;
 
 
-    public DBService(String host, String port, String user, String password){
+    public DB(String host, String port, String user, String password){
         arango = new ArangoDB.Builder()
                 .host(host)
                 .port(Integer.parseInt(port))
                 .user(user)
                 .password(password)
                 .build();
+
+
     }
 
 
 
     public void init(){
         loadDB();
-        gins = new Gins(db, this);
-        tonics = new Tonics(db, this);
-        garnishes = new Garnishes(db, this);
-        combinations = new Combinations(db, this);
-        users = new Users(db, this);
-        ratings = new Ratings(db, this);
-
+        gins = new Gins(db);
+        tonics = new Tonics(db);
+        garnishes = new Garnishes(db);
+        combinations = new Combinations(db);
+        users = new Users(db);
+        ratings = new Ratings(db);
     }
 
     private void loadDB(){
@@ -74,11 +75,9 @@ public class DBService{
         tonics.resetCollection();
         garnishes.resetCollection();
         combinations.resetCollection();
-        //users.resetCollection();
-        //ratings.resetCollection();
+        users.resetCollection();
+        ratings.resetCollection();
     }
-
-
 
 
 }

@@ -19,8 +19,16 @@ public class User extends Primitive {
         return microRatings;
     }
 
+    public void insertMicroRating(MicroRating mr){
+        this.microRatings.add(mr);
+    }
+
     public void setMicroRatings(List<MicroRating> microRatings) {
         this.microRatings = microRatings;
+    }
+
+    public int getNumRatings(){
+        return microRatings.size();
     }
 
     public String prettyPrint(){
@@ -34,4 +42,5 @@ public class User extends Primitive {
         }
         return response.toString();
     }
+
 }

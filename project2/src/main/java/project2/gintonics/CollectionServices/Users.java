@@ -1,8 +1,7 @@
-package project2.gintonics.Services;
+package project2.gintonics.CollectionServices;
 
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.DocumentCreateEntity;
-import project2.gintonics.DBService;
 import project2.gintonics.Entities.User;
 
 import java.util.List;
@@ -10,8 +9,8 @@ import java.util.List;
 public class Users extends CollectionService {
     public static final String NAME = "users";
 
-    public Users(ArangoDatabase db, DBService service) {
-        super(db, service, NAME);
+    public Users(ArangoDatabase db) {
+        super(db, NAME);
     }
 
 
@@ -27,6 +26,10 @@ public class Users extends CollectionService {
 
     public User getByKey(String key) {
         return super.getByKey(key, User.class);
+    }
+
+    public void update(User user){
+        super.updateByKey(user.getKey(), user);
     }
 
 

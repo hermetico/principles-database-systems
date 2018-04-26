@@ -66,28 +66,31 @@ public class Combination extends Primitive {
         return avgRating;
     }
 
-    public void setAvgRating(float avgRating) {
-        this.avgRating = avgRating;
-    }
-
     public int getNumRatings() {
         return numRatings;
     }
 
-    public void setNumRatings(int numRatings) {
-        this.numRatings = numRatings;
+
+    public void updateMovingAverage(int newRating){
+        if(this.numRatings == 0){
+            this.avgRating = newRating;
+        }else{
+            float avg = this.avgRating * this.numRatings;
+            this.avgRating = (avg + newRating) / (this.numRatings + 1);
+        }
+        this.numRatings++;
     }
 
     public String prettyPrint(){
         StringBuilder response =  new StringBuilder();
         response.append("Combination: " + name);
-        response.append("\n\tid:" + key);
-        response.append("\n\tgin:" + gin);
-        response.append("\n\ttonic:" + tonic);
+        response.append("\n\tid: " + key);
+        response.append("\n\tgin: " + gin);
+        response.append("\n\ttonic: " + tonic);
         if(garnish != null)
-            response.append("\n\tgarnish:" + garnish);
-        response.append("\n\tAverage rating:" + avgRating);
-        response.append("\n\tNum rating:" + numRatings);
+            response.append("\n\tgarnish: " + garnish);
+        response.append("\n\tAverage rating: " + avgRating);
+        response.append("\n\tNum ratings: " + numRatings);
 
         return response.toString();
     }

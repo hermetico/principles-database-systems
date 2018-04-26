@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
-public class CollectionServicesTests {
+public class CollectionDBServicesTests {
     private final String HOST = "localhost";
     private final String PORT = "8529";
     private final String USER = "root";
@@ -21,18 +21,16 @@ public class CollectionServicesTests {
     DB db;
     int numCombinations = 0;
 
+
     @Before
     public void setUp() throws Exception {
         db = new DB(HOST, PORT, USER, PASSWORD);
         db.init();
         db.resetCollections();
-        fillDB(db);
 
     }
 
-    public void fillDB(DB db) throws Exception {
-        // hack to call this tests from the other set of tests
-        this.db = db;
+    public void fillDB() throws Exception {
 
         Combination combination;
         Gin gin;
