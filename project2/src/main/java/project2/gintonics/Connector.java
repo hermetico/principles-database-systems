@@ -6,13 +6,18 @@ import project2.gintonics.CollectionServices.*;
 import java.io.PrintStream;
 
 
-public class DB {
+public class Connector {
     private final String DBNAME = "gins-tonics";
 
     private PrintStream out = System.out;
     private PrintStream err = System.err;
 
     private ArangoDB arango;
+
+    public ArangoDatabase getDb() {
+        return db;
+    }
+
     private ArangoDatabase db;
     public Gins gins;
     public Tonics tonics;
@@ -22,7 +27,7 @@ public class DB {
     public Ratings ratings;
 
 
-    public DB(String host, String port, String user, String password){
+    public Connector(String host, String port, String user, String password){
         arango = new ArangoDB.Builder()
                 .host(host)
                 .port(Integer.parseInt(port))
@@ -70,7 +75,7 @@ public class DB {
         }
     }
 
-    public void resetCollections(){
+    public void resetAllCollections(){
         gins.resetCollection();
         tonics.resetCollection();
         garnishes.resetCollection();

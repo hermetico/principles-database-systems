@@ -4,13 +4,13 @@ package project2.gintonics.CollectionServices;
 
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.DocumentCreateEntity;
-import project2.gintonics.DB;
-import project2.gintonics.Entities.MicroRating;
+import com.arangodb.util.MapBuilder;
+import project2.gintonics.Entities.Combination;
 import project2.gintonics.Entities.Rating;
-import project2.gintonics.Entities.User;
 
 
 import java.util.List;
+import java.util.Map;
 
 public class Ratings extends CollectionService {
     private static final String NAME = "ratings";
@@ -36,5 +36,37 @@ public class Ratings extends CollectionService {
         return super.getByKey(key, Rating.class);
     }
 
+    public List<Rating> getByCombinationKey(Combination combination, int page, int pageSize){
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR r IN @@collection\n");
+        builder.append("FILTER r.combinationKey == @combinationKey\n");
+        builder.append("LIMIT " + page * pageSize + ", " + pageSize + "\n");
+        builder.append("RETURN r");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("combinationKey", combination.getKey().toString())
+                .get();
+
+        return db.query(query, bindVars, null, Rating.class).asListRemaining();
+    }
+
+    public int getCountOfByCombinationKey(Combination combination){
+        StringBuilder builder = new StringBuilder();
+        builder.append("Return LENGTH(\n");
+            builder.append("FOR r IN @@collection\n");
+            builder.append("FILTER r.combinationKey == @combinationKey\n");
+            builder.append("RETURN r\n");
+        builder.append(")");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("combinationKey", combination.getKey().toString())
+                .get();
+
+        return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0);
+    }
 
 }

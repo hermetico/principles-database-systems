@@ -1,5 +1,7 @@
 package project2.gintonics.Entities;
 
+import project2.gintonics.Utils.Utils;
+
 public class Combination extends Primitive {
     private String gin;
     private String tonic;
@@ -12,7 +14,7 @@ public class Combination extends Primitive {
     }
 
     public Combination(Gin gin, Tonic tonic, Garnish garnish){
-        super(gin.getName() + " with " + tonic.getName() + " and " + garnish.getName());
+        super(Utils.getCombinationName(gin.getName(), tonic.getName(), garnish.getName()));
         this.gin = gin.getName();
         this.tonic = tonic.getName();
         this.garnish = garnish.getName();
@@ -21,7 +23,7 @@ public class Combination extends Primitive {
     }
 
     public Combination(Gin gin, Tonic tonic){
-        super(gin.getName() + " with " + tonic.getName());
+        super(Utils.getCombinationName(gin.getName(), tonic.getName()));
         this.gin = gin.getName();
         this.tonic = tonic.getName();
         this.avgRating = 0f;

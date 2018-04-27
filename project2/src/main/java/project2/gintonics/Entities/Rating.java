@@ -72,9 +72,6 @@ public class Rating extends Primitive {
         this.helpfulCount = helpfulCount;
     }
 
-    /*public List<Rating> getByGin(){
-
-    }*/
 
     public String prettyPrint(){
         StringBuilder response = new StringBuilder();

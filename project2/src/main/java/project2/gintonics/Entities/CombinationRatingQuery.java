@@ -2,10 +2,10 @@ package project2.gintonics.Entities;
 
 import java.util.List;
 
-public class CombinationRatingsQuery {
+public class CombinationRatingQuery {
     private Combination combination;
-    private List<Rating> ratings;
-    public CombinationRatingsQuery(){
+    private Rating rating;
+    public CombinationRatingQuery(){
         super();
     }
 
@@ -13,19 +13,14 @@ public class CombinationRatingsQuery {
         return combination;
     }
 
-    public List<Rating> getRatings() {
-        return ratings;
+    public Rating getRating() {
+        return rating;
     }
 
     public String prettyPrint(){
         StringBuilder response = new StringBuilder();
         response.append(combination.prettyPrint());
-        if(ratings.size() > 0){
-            response.append("\n\tRatings:");
-            for(Rating rating: ratings){
-                response.append("\n\t" + rating.prettyPrint());
-            }
-        }
+        response.append(rating.prettyPrint());
         return response.toString();
     }
 }

@@ -2,9 +2,12 @@ package project2.gintonics.CollectionServices;
 
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.DocumentCreateEntity;
+import com.arangodb.util.MapBuilder;
 import project2.gintonics.Entities.Combination;
+import project2.gintonics.Utils.Utils;
 
 import java.util.List;
+import java.util.Map;
 
 public class Combinations extends CollectionService {
     private static final String NAME = "combinations";
@@ -28,6 +31,16 @@ public class Combinations extends CollectionService {
 
     public void update(Combination combination){
         super.updateByKey(combination.getKey(), combination);
+    }
+
+    public boolean existsByGinAndTonic(String gin, String tonic){
+        String combinationName = Utils.getCombinationName(gin, tonic);
+        return super.existsByName(combinationName);
+    }
+
+    public boolean existsByGinAndTonicAndGarnish(String gin, String tonic, String garnish){
+        String combinationName = Utils.getCombinationName(gin, tonic, garnish);
+        return super.existsByName(combinationName);
     }
 
 

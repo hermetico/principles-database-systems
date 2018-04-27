@@ -1,47 +1,55 @@
 package project2.gintonics;
 
-import com.arangodb.entity.BaseDocument;
+import com.arangodb.ArangoDatabase;
 import com.arangodb.util.MapBuilder;
 import project2.gintonics.CollectionServices.*;
 import project2.gintonics.Entities.*;
+import project2.gintonics.Utils.Constraints;
 
 import java.util.List;
 import java.util.Map;
 
 public class DBServices implements IDBServices {
 
-    private DB db;
+    private Connector connector;
     private Gins gins;
     private Tonics tonics;
     private Garnishes garnishes;
     private Combinations combinations;
     private Users users;
     private Ratings ratings;
+    private ArangoDatabase db;
 
     public DBServices(String host, String port, String user, String password){
-        db = new DB(host, port, user, password);
-        db.init();
+        connector = new Connector(host, port, user, password);
+        connector.init();
         linkServices();
 
     }
 
-    public DBServices(DB db){
-        this.db = db;
+    public DBServices(Connector connector){
+        this.connector = connector;
         this.linkServices();
 
     }
+
+    public Connector getConnector(){
+        return connector;
+    }
+
     private void linkServices(){
-        this.gins = db.gins;
-        this.tonics = db.tonics;
-        this.garnishes = db.garnishes;
-        this.combinations = db.combinations;
-        this.users = db.users;
-        this.ratings = db.ratings;
+        this.db = connector.getDb();
+        this.gins = connector.gins;
+        this.tonics = connector.tonics;
+        this.garnishes = connector.garnishes;
+        this.combinations = connector.combinations;
+        this.users = connector.users;
+        this.ratings = connector.ratings;
     }
 
     @Override
     public void resetCollections(){
-        db.resetCollections();
+        connector.resetAllCollections();
     }
 
     @Override
@@ -50,8 +58,18 @@ public class DBServices implements IDBServices {
     }
 
     @Override
+    public List<Gin> getAllGins() {
+        return gins.getAll();
+    }
+
+    @Override
     public void insertGin(Gin gin) {
         gins.insert(gin);
+    }
+
+    @Override
+    public void resetGinsCollection() {
+        gins.resetCollection();
     }
 
     @Override
@@ -60,8 +78,18 @@ public class DBServices implements IDBServices {
     }
 
     @Override
+    public List<Tonic> getAllTonics() {
+        return tonics.getAll();
+    }
+
+    @Override
     public void insertTonic(Tonic tonic) {
         tonics.insert(tonic);
+    }
+
+    @Override
+    public void resetTonicsCollection() {
+        tonics.resetCollection();
     }
 
     @Override
@@ -70,13 +98,35 @@ public class DBServices implements IDBServices {
     }
 
     @Override
+    public List<Garnish> getAllGarnishes() {
+        return garnishes.getAll();
+    }
+
+    @Override
     public void insertGarnish(Garnish garnish) {
         garnishes.insert(garnish);
     }
 
-    public DB getDb(){
-        return db;
+    @Override
+    public void resetGarnishesCollection() {
+        garnishes.resetCollection();
     }
+
+    @Override
+    public boolean existsCombination(Combination combination) {
+        return existsCombinationByGinAndTonicAndGarnish(combination.getGin(), combination.getTonic(), combination.getGarnish());
+    }
+
+    @Override
+    public boolean existsCombinationByGinAndTonic(String gin, String tonic) {
+        return existsCombinationByGinAndTonicAndGarnish(gin, tonic, null);
+    }
+
+    @Override
+    public boolean existsCombinationByGinAndTonicAndGarnish(String gin, String tonic, String garnish) {
+        return combinations.existsByGinAndTonicAndGarnish(gin, tonic, garnish);
+    }
+
 
     @Override
     public int getNumCombinations() {
@@ -95,7 +145,12 @@ public class DBServices implements IDBServices {
 
     @Override
     public Combination getCombinationByKey(String key) {
-        return null;
+        return combinations.getByKey(key);
+    }
+
+    @Override
+    public void resetCombinationsCollection() {
+        combinations.resetCollection();
     }
 
     @Override
@@ -111,6 +166,11 @@ public class DBServices implements IDBServices {
     @Override
     public void insertUser(User user) {
         users.insert(user);
+    }
+
+    @Override
+    public void resetUsersCollection() {
+        users.resetCollection();
     }
 
 
@@ -137,44 +197,133 @@ public class DBServices implements IDBServices {
 
     }
 
+    @Override
+    public List<Rating> getRatingsByCombination(Combination combination) {
+        return getRatingsByCombination(combination, 0, Constraints.MAXRECORDS);
+    }
 
     @Override
-    public List<CombinationRatingsQuery> getRatingsByGinAndTonic(Gin gin, Tonic tonic) {
+    public List<Rating> getRatingsByCombination(Combination combination, int page, int pageSize) {
+        return ratings.getByCombinationKey(combination, page, pageSize);
+    }
+
+    @Override
+    public void resetRatingsCollection() {
+        ratings.resetCollection();
+    }
+
+    @Override
+    public int getCountOfRatingsByGinAndTonic(String gin, String tonic) {
         StringBuilder builder = new StringBuilder();
-        builder.append("FOR c IN " + combinations.getCollectionName() + "\n");
-        builder.append("FILTER c.gin == @gin\n");
-        builder.append("FILTER c.tonic == @tonic\n");
-        builder.append("RETURN {\n");
-            builder.append("combination: c");
-            builder.append("combinationRatings: (");
-                builder.append("FOR r IN " + ratings.getCollectionName() + "\n");
+        builder.append("Return LENGTH(\n");
+            builder.append("FOR c IN @@leftCollection\n");
+            builder.append("FILTER c.gin == @gin\n");
+            builder.append("FILTER c.tonic == @tonic\n");
+                builder.append("FOR r IN @@rightCollection\n");
                 builder.append("FILTER r.combinationKey == c._key\n");
-                builder.append("RETURN r\n");
-            builder.append(")\n");
-        builder.append("}");
+            builder.append("RETURN {\n");
+                builder.append("combination: c,\n");
+                builder.append("rating: r\n");
+            builder.append("}\n");
+        builder.append(")");
 
         String query = builder.toString();
         Map<String, Object> bindVars = new MapBuilder()
-                .put("gin", gin.getName())
-                .put("tonic", tonic.getName())
+                .put("@leftCollection", combinations.getCollectionName())
+                .put("@rightCollection", ratings.getCollectionName())
+                .put("gin", gin)
+                .put("tonic", tonic)
                 .get();
-        //return db.conn.query(query, bindVars, null, BaseDocument.class).asListRemaining().size() != 0;
-        return null;
+
+        return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0);
     }
 
     @Override
-    public List<CombinationRatingsQuery> getRatingsByGinAndTonicAndGarnish(Gin gin, Tonic tonic, Garnish garnish) {
-        return null;
+    public int getCountOfRatingsByGinAndTonicAndGarnish(String gin, String tonic, String garnish) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Return LENGTH(\n");
+            builder.append("FOR c IN @@leftCollection\n");
+            builder.append("FILTER c.gin == @gin\n");
+            builder.append("FILTER c.tonic == @tonic\n");
+            builder.append("FILTER c.garnish == @garnish\n");
+                builder.append("FOR r IN @@rightCollection\n");
+                builder.append("FILTER r.combinationKey == c._key\n");
+            builder.append("RETURN {\n");
+                builder.append("combination: c,\n");
+                builder.append("rating: r\n");
+            builder.append("}\n");
+        builder.append(")");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@leftCollection", combinations.getCollectionName())
+                .put("@rightCollection", ratings.getCollectionName())
+                .put("gin", gin)
+                .put("tonic", tonic)
+                .put("garnish", garnish)
+                .get();
+
+        return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0);
     }
 
     @Override
-    public List<CombinationRatingsQuery> getRatingsByGinAndTonic(Gin gin, Tonic tonic, int page) {
-        return null;
+    public List<CombinationRatingQuery> getRatingsByGinAndTonic(String gin, String tonic) {
+        return getRatingsByGinAndTonic(gin, tonic, 0, Constraints.MAXRECORDS);
     }
 
     @Override
-    public List<CombinationRatingsQuery> getRatingsByGinAndTonicAndGarnish(Gin gin, Tonic tonic, Garnish garnish, int page) {
-        return null;
+    public List<CombinationRatingQuery> getRatingsByGinAndTonicAndGarnish(String gin, String tonic, String garnish) {
+        return getRatingsByGinAndTonicAndGarnish(gin, tonic, garnish, 0, Constraints.MAXRECORDS);
+    }
+
+    @Override
+    public List<CombinationRatingQuery> getRatingsByGinAndTonic(String gin, String tonic, int page, int pageSize) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR c IN @@leftCollection\n");
+        builder.append("FILTER c.gin == @gin\n");
+        builder.append("FILTER c.tonic == @tonic\n");
+            builder.append("FOR r IN @@rightCollection\n");
+            builder.append("FILTER r.combinationKey == c._key\n");
+        builder.append("LIMIT " + page * pageSize + ", " + pageSize + "\n");
+        builder.append("RETURN {\n");
+            builder.append("combination: c,\n");
+            builder.append("rating: r\n");
+        builder.append("}\n");
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@leftCollection", combinations.getCollectionName())
+                .put("@rightCollection", ratings.getCollectionName())
+                .put("gin", gin)
+                .put("tonic", tonic)
+                .get();
+        return db.query(query, bindVars, null, CombinationRatingQuery.class).asListRemaining();
+
+    }
+
+    @Override
+    public List<CombinationRatingQuery> getRatingsByGinAndTonicAndGarnish(String gin, String tonic, String garnish, int page, int pageSize) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR c IN @@leftCollection\n");
+        builder.append("FILTER c.gin == @gin\n");
+        builder.append("FILTER c.tonic == @tonic\n");
+        builder.append("FILTER c.garnish == @garnish\n");
+            builder.append("FOR r IN @@rightCollection\n");
+            builder.append("FILTER r.combinationKey == c._key\n");
+        builder.append("LIMIT " + page * pageSize + ", " + pageSize + "\n");
+        builder.append("RETURN {\n");
+            builder.append("combination: c,\n");
+            builder.append("rating: r\n");
+        builder.append("}\n");
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@leftCollection", combinations.getCollectionName())
+                .put("@rightCollection", ratings.getCollectionName())
+                .put("gin", gin)
+                .put("tonic", tonic)
+                .put("garnish", garnish)
+                .get();
+
+        return db.query(query, bindVars, null, CombinationRatingQuery.class).asListRemaining();
     }
 
 

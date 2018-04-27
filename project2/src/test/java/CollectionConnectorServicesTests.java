@@ -2,8 +2,8 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import project2.gintonics.Connector;
 import project2.gintonics.Entities.*;
-import project2.gintonics.DB;
 
 import java.io.File;
 
@@ -12,21 +12,21 @@ import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
-public class CollectionDBServicesTests {
+public class CollectionConnectorServicesTests {
     private final String HOST = "localhost";
     private final String PORT = "8529";
     private final String USER = "root";
     private final String PASSWORD = "1234";
     private final String GINTONICS_FILE = "gintonics.csv";
-    DB db;
+    Connector connector;
     int numCombinations = 0;
 
 
     @Before
     public void setUp() throws Exception {
-        db = new DB(HOST, PORT, USER, PASSWORD);
-        db.init();
-        db.resetCollections();
+        connector = new Connector(HOST, PORT, USER, PASSWORD);
+        connector.init();
+        connector.resetAllCollections();
         fillDB();
 
     }
@@ -57,18 +57,18 @@ public class CollectionDBServicesTests {
 
 
 
-            if(!db.gins.existsByName(gin.getName())){
-                db.gins.insert(gin);
+            if(!connector.gins.existsByName(gin.getName())){
+                connector.gins.insert(gin);
             }
 
-            if(!db.tonics.existsByName(tonic.getName())){
-                db.tonics.insert(tonic);
+            if(!connector.tonics.existsByName(tonic.getName())){
+                connector.tonics.insert(tonic);
             }
 
             if(parts.length > 4) {
                 garnish = new Garnish(parts[3]);
-                if(!db.garnishes.existsByName(garnish.getName())){
-                    db.garnishes.insert(garnish);
+                if(!connector.garnishes.existsByName(garnish.getName())){
+                    connector.garnishes.insert(garnish);
                 }
             }
 
@@ -79,7 +79,7 @@ public class CollectionDBServicesTests {
                 combination = new Combination(gin, tonic, garnish);
             }
 
-            db.combinations.insert(combination);
+            connector.combinations.insert(combination);
         }
         scanner.close();
 
@@ -87,28 +87,28 @@ public class CollectionDBServicesTests {
     @Test
     public void printAndCountCombinations(){
         System.out.println("Printing all combinations");
-        List<Combination> combinations = db.combinations.getAll();
+        List<Combination> combinations = connector.combinations.getAll();
         for(Combination combination: combinations){
             System.out.println(combination.prettyPrint());
         }
         System.out.println("Testing num of current combinations");
-        int size = db.combinations.getSize();
+        int size = connector.combinations.getSize();
         assertEquals(numCombinations,size);
         System.out.println("Num of combinations = " + size + ", as expected");
     }
 
     @Test
     public void getCombination(){
-        List<Combination> combinations = db.combinations.getAll();
+        List<Combination> combinations = connector.combinations.getAll();
         Combination combi = combinations.get(7);
 
         System.out.println("Selecting combination with key: " + combi.getKey());
-        combi = db.combinations.getByKey(combi.getKey());
+        combi = connector.combinations.getByKey(combi.getKey());
         assertNotNull(combi);
         System.out.println(combi.prettyPrint());
 
         System.out.println("Selecting combination with key 'Wrong-key' which does not exist");
-        combi = db.combinations.getByKey("Wrong-key");
+        combi = connector.combinations.getByKey("Wrong-key");
         assertNull(combi);
         System.out.println("It does not exist");
 
@@ -116,12 +116,12 @@ public class CollectionDBServicesTests {
 
     @Test
     public void deleteCombination(){
-        List<Combination> combinations = db.combinations.getAll();
+        List<Combination> combinations = connector.combinations.getAll();
         Combination combi = combinations.get(7);
         System.out.println("Deleting combination with key: " + combi.getKey());
-        db.combinations.deleteByKey(combi.getKey());
+        connector.combinations.deleteByKey(combi.getKey());
         System.out.println("Selecting combination with key " + combi.getKey() + ", which should not exist anymore");
-        combi = db.combinations.getByKey(combi.getKey());
+        combi = connector.combinations.getByKey(combi.getKey());
         assertNull(combi);
         System.out.println("It does not exist");
 
@@ -131,29 +131,29 @@ public class CollectionDBServicesTests {
     @Test
     public void deleteGin(){
         System.out.println("Deleting a gin");
-        List<Gin> all = db.gins.getAll();
+        List<Gin> all = connector.gins.getAll();
         int total = all.size();
-        db.gins.delete(all.get(0).getKey());
-        assertEquals(db.gins.getSize(), total - 1);
+        connector.gins.delete(all.get(0).getKey());
+        assertEquals(connector.gins.getSize(), total - 1);
 
     }
 
     @Test
     public void deleteTonic() {
         System.out.println("Deleting a tonic");
-        List<Tonic> all = db.tonics.getAll();
+        List<Tonic> all = connector.tonics.getAll();
         int total = all.size();
-        db.tonics.delete(all.get(0).getKey());
-        assertEquals(db.tonics.getSize(), total - 1);
+        connector.tonics.delete(all.get(0).getKey());
+        assertEquals(connector.tonics.getSize(), total - 1);
     }
 
     @Test
     public void deleteGarnish() {
         System.out.println("Deleting a garnish");
-        List<Garnish> all = db.garnishes.getAll();
+        List<Garnish> all = connector.garnishes.getAll();
         int total = all.size();
-        db.garnishes.delete(all.get(0).getKey());
-        assertEquals(db.garnishes.getAll().size(), total - 1);
+        connector.garnishes.delete(all.get(0).getKey());
+        assertEquals(connector.garnishes.getAll().size(), total - 1);
     }
 
 
@@ -161,8 +161,8 @@ public class CollectionDBServicesTests {
     public void createUser() {
         System.out.println("Creating user Juan");
         User user = new User("Juan");
-        System.out.println("Inserting it into DB");
-        db.users.insert(user);
+        System.out.println("Inserting it into Connector");
+        connector.users.insert(user);
         System.out.println(user.prettyPrint());
 
     }
@@ -170,17 +170,17 @@ public class CollectionDBServicesTests {
     @Test
     public void createRatingAndMicroRating(){
         System.out.println("Creating rating");
-        Combination combi = db.combinations.getAll().get(0);
-        if(db.users.getSize() == 0) createUser();
-        User user = db.users.getAll().get(0);
+        Combination combi = connector.combinations.getAll().get(0);
+        if(connector.users.getSize() == 0) createUser();
+        User user = connector.users.getAll().get(0);
         String comment = "Really tasty";
         int value = 9;
         Rating rating = new Rating(combi, user, comment, value);
         // append also the user to update it
-        db.ratings.insert(rating);
+        connector.ratings.insert(rating);
         System.out.println(rating.prettyPrint());
 
-        user = db.users.getByKey(user.getKey());
+        user = connector.users.getByKey(user.getKey());
         System.out.println(user.prettyPrint());
     }
 }

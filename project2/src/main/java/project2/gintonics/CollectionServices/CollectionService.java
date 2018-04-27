@@ -85,11 +85,12 @@ public class CollectionService implements ICollectionService {
 
     @Override
     public boolean existsByName(String name) {
-        String query = "FOR t IN " + _CNAME+ " FILTER t.name == @name return t";
+        String query = "RETURN LENGTH(FOR t IN @@collection FILTER t.name == @name return t)";
         Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", _CNAME)
                 .put("name", name)
                 .get();
-        return db.query(query, bindVars, null, BaseDocument.class).asListRemaining().size() != 0;
+        return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0) > 0;
     }
 
     @Override

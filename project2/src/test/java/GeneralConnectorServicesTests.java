@@ -1,17 +1,18 @@
 import org.junit.Before;
 import org.junit.Test;
-import project2.gintonics.DB;
 import project2.gintonics.DBServices;
 import project2.gintonics.Entities.*;
 import project2.gintonics.IDBServices;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
-public class GeneralDBServicesTests {
+public class GeneralConnectorServicesTests {
     private final String HOST = "localhost";
     private final String PORT = "8529";
     private final String USER = "root";
@@ -25,7 +26,8 @@ public class GeneralDBServicesTests {
     @Before
     public void setUp() throws Exception {
         dbServices = new DBServices(HOST, PORT, USER, PASSWORD);
-        dbServices.resetCollections();
+        //dbServices.resetCollections();
+
         fillDB();
     }
 
@@ -73,7 +75,10 @@ public class GeneralDBServicesTests {
                 combination = new Combination(gin, tonic, garnish);
             }
 
-            dbServices.insertCombination(combination);
+            if(!dbServices.existsCombination(combination)){
+                dbServices.insertCombination(combination);
+            }
+
         }
         scanner.close();
 
@@ -82,11 +87,14 @@ public class GeneralDBServicesTests {
     @Test
     public void createUser() {
         System.out.println("Creating user Juan");
-        User user = new User("Juan");
-        System.out.println("Inserting it into DB");
-        dbServices.insertUser(user);
-        System.out.println(user.prettyPrint());
+        createUser("Juan");
 
+    }
+
+    public void createUser(String name){
+        User user = new User(name);
+        dbServices.insertUser(user);
+        System.out.println("User: " + user.prettyPrint());
     }
 
     @Test
@@ -130,6 +138,70 @@ public class GeneralDBServicesTests {
         assertEquals(user.getNumRatings(), 2);
         assertEquals((long) combi.getAvgRating(), (9+6) / 2);
 
+    }
+
+    @Test
+    public void createManyRatings(){
+       createManyRatings(100);
+
+    }
+
+    public void createManyRatings(int count){
+        Random rn = new Random();
+        out.println("Creating " + count + " ratings");
+        for(int i = 0; i<5; i++){
+            createUser(String.valueOf(i));
+        }
+
+        List<Combination> combinations = dbServices.getAllCombinations();
+        int numCombinations = combinations.size();
+        List<User> users = dbServices.getAllUsers();
+        int numUsers = users.size();
+        for(int i = 0; i < 10000; i++){
+            Combination combi = combinations.get(i % numCombinations);
+            User user = users.get(i % numUsers);
+            dbServices.rateCombination(combi, user, "Good enough", rn.nextInt(11));
+
+        }
+    }
+
+    @Test
+    public void queryRatingByGinAndTonic(){
+        Combination combination = dbServices.getAllCombinations().get(0);
+        int pageSize = 10;
+        int pages = (int) Math.ceil(dbServices.getCountOfRatingsByGinAndTonic(combination.getGin(), combination.getTonic()) / pageSize);
+        for(int i = 0; i < pages; i++){
+            List<CombinationRatingQuery> combinationRatings = dbServices.getRatingsByGinAndTonic(combination.getGin(), combination.getTonic(), i, pageSize);
+            out.println("Showing ratings for page: " + i+1);
+            for(CombinationRatingQuery crq : combinationRatings){
+                out.println(crq.getCombination().prettyPrint());
+                out.println(crq.getRating().prettyPrint());
+            }
+        }
+
+    }
+
+    @Test
+    public void queryRatingByGinAndTonicAndGarnish(){
+        Combination combination = dbServices.getAllCombinations().get(0);
+        int pageSize = 10;
+        int pages = (int) Math.ceil(dbServices.getCountOfRatingsByGinAndTonicAndGarnish(
+                combination.getGin(),
+                combination.getTonic(),
+                combination.getGarnish()) / pageSize);
+
+        for(int i = 0; i < pages; i++){
+            List<CombinationRatingQuery> combinationRatings = dbServices.getRatingsByGinAndTonicAndGarnish(
+                    combination.getGin(),
+                    combination.getTonic(),
+                    combination.getGarnish(),
+                    i, pageSize);
+            out.println("Showing ratings for page: " + i+1);
+            for(CombinationRatingQuery crq : combinationRatings){
+                out.println(crq.getCombination().prettyPrint());
+                out.println(crq.getRating().prettyPrint());
+            }
+        }
     }
 
 }
