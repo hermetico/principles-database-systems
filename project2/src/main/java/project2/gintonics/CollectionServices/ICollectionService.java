@@ -13,4 +13,5 @@ public interface ICollectionService {
     <T> T getByKey(String key, Class<T> asType);
     <T> DocumentCreateEntity insert(T obj);
     String getCollectionName();
+    public <T> List<T> getByName(String name, Class<T> asType);
 }

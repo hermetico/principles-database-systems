@@ -94,6 +94,16 @@ public class CollectionService implements ICollectionService {
     }
 
     @Override
+    public <T> List<T> getByName(String name, Class<T> asType) {
+        String query = "FOR t IN @@collection FILTER t.name == @name return t";
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", _CNAME)
+                .put("name", name)
+                .get();
+        return db.query(query, bindVars, null, asType).asListRemaining();
+    }
+
+    @Override
     public void delete(String key) {
         collection.deleteDocument(key);
     }

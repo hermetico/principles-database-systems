@@ -33,4 +33,8 @@ public class Users extends CollectionService {
     }
 
 
+    public List<User> getByName(String name){
+        return super.getByName(name, User.class);
+    }
+
 }

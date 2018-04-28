@@ -204,4 +204,90 @@ public class GeneralConnectorServicesTests {
         }
     }
 
+    @Test
+    public void queryMicroRatingsByUserName(){
+        String userName = dbServices.getAllUsers().get(0).getName();
+        out.println("Querying user: " + userName);
+        List<User> users = dbServices.getUsersByName(userName);
+        for(User user: users){
+            out.println("User: " + user.getName());
+            out.println("Combinations rated: " + user.getNumRatings());
+            for(MicroRating mr: user.getMicroRatings()){
+                out.println("\tCombination: " + mr.getName());
+                out.println("\tRating: " + mr.getRatingValue());
+            }
+        }
+    }
+
+    @Test
+    public void queryMicroRatingsByUserKey(){
+        String userKey = dbServices.getAllUsers().get(0).getKey();
+        out.println("Querying user: " + userKey);
+        User user = dbServices.getUserByKey(userKey);
+        out.println("User: " + user.getName());
+        out.println("Combinations rated: " + user.getNumRatings());
+        for(MicroRating mr: user.getMicroRatings()){
+            out.println("\tCombination: " + mr.getName());
+            out.println("\tRating: " + mr.getRatingValue());
+        }
+    }
+
+    @Test
+    public void queryFullRatingsByUserName(){
+        String userName = dbServices.getAllUsers().get(0).getName();
+        out.println("Querying user: " + userName);
+        int pageSize = 10;
+        int pages = (int) Math.ceil(dbServices.getCountOfRatingsByUserName(userName) / pageSize);
+        for(int i = 0; i < pages; i++) {
+            List<Rating> ratings = dbServices.getRatingsByUserName(userName, i, pageSize);
+            for (Rating rating : ratings) {
+                out.println(rating.prettyPrint());
+            }
+        }
+    }
+
+    @Test
+    public void queryFullRatingsByUserKey(){
+        String userKey = dbServices.getAllUsers().get(0).getKey();
+        out.println("Querying user: " + userKey);
+        int pageSize = 10;
+        int pages = (int) Math.ceil(dbServices.getCountOfRatingsByUserKey(userKey) / pageSize);
+        for(int i = 0; i < pages; i++) {
+            List<Rating> ratings = dbServices.getRatingsByUserKey(userKey, i, pageSize);
+            for (Rating rating : ratings) {
+                out.println(rating.prettyPrint());
+            }
+        }
+    }
+
+    @Test
+    public void setRatingAsHelpful(){
+        Random rn = new Random();
+        int numRatings = dbServices.getNumRatings();
+        Rating rating = dbServices.getAllRatings().get(rn.nextInt(numRatings));
+        out.println("Marking rating as helpful");
+        out.println(rating.prettyPrint());
+        rating = dbServices.markRatingAsHelpful(rating);
+        out.println("After...");
+        out.println(rating.prettyPrint());
+
+    }
+
+    @Test
+    public void showRatingsByHelpfulness(){
+        out.println("Marking some ratings as helfpul");
+        List<Rating> ratings = dbServices.getAllRatings();
+        int numRatings = ratings.size();
+        Random rn = new Random();
+        for(int i = 0; i < 1000; i++){
+            dbServices.markRatingAsHelpful(ratings.get(rn.nextInt(numRatings)));
+        }
+
+        out.println("Showing top 5 ratings");
+        ratings = dbServices.getRatingsSortedByHelpfulness(0, 5);
+        for (Rating rating : ratings) {
+            out.println(rating.prettyPrint());
+        }
+
+    }
 }

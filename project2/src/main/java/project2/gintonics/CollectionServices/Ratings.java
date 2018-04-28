@@ -69,4 +69,114 @@ public class Ratings extends CollectionService {
         return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0);
     }
 
+    public List<Rating> getByUserName(String userName, int page, int pageSize){
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR r IN @@collection\n");
+        builder.append("FILTER r.userName == @userName\n");
+        builder.append("SORT r.ratingValue DESC\n");
+        builder.append("LIMIT " + page * pageSize + ", " + pageSize + "\n");
+        builder.append("RETURN r");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("userName", userName)
+                .get();
+
+        return db.query(query, bindVars, null, Rating.class).asListRemaining();
+    }
+
+    public int getCountOfByUserName(String userName){
+        StringBuilder builder = new StringBuilder();
+        builder.append("Return LENGTH(\n");
+            builder.append("FOR r IN @@collection\n");
+            builder.append("FILTER r.userName == @userName\n");
+            builder.append("SORT r.ratingValue DESC\n");
+            builder.append("RETURN r\n");
+        builder.append(")");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("userName", userName)
+                .get();
+
+        return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0);
+    }
+
+    public List<Rating> getByUserKey(String userKey, int page, int pageSize){
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR r IN @@collection\n");
+        builder.append("FILTER r.userKey == @userKey\n");
+        builder.append("SORT r.ratingValue DESC\n");
+        builder.append("LIMIT " + page * pageSize + ", " + pageSize + "\n");
+        builder.append("RETURN r");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("userKey", userKey)
+                .get();
+
+        return db.query(query, bindVars, null, Rating.class).asListRemaining();
+    }
+
+    public int getCountOfByUserKey(String userKey){
+        StringBuilder builder = new StringBuilder();
+        builder.append("Return LENGTH(\n");
+            builder.append("FOR r IN @@collection\n");
+            builder.append("FILTER r.userKey == @userKey\n");
+            builder.append("SORT r.ratingValue DESC\n");
+            builder.append("RETURN r\n");
+        builder.append(")");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("userKey", userKey)
+                .get();
+
+        return db.query(query, bindVars, null, Integer.class).asListRemaining().get(0);
+    }
+
+    /**
+     * Increases the helpful count of the ratingKey given
+     * and returns the updated rating
+     * @param ratingKey
+     * @return
+     */
+    public Rating increaseHelpfulCountByKey(String ratingKey){
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR r IN @@collection\n");
+        builder.append("FILTER r._key == @ratingKey\n");
+        builder.append("UPDATE r WITH {\n");
+            builder.append("helpfulCount : r.helpfulCount + 1\n");
+        builder.append("}\n");
+        builder.append("IN ratings\n");
+        builder.append("RETURN NEW\n");
+        String query = builder.toString();
+
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .put("ratingKey", ratingKey)
+                .get();
+
+        return db.query(query, bindVars, null, Rating.class).asListRemaining().get(0);
+
+    }
+
+    public List<Rating> getSortedByHelpfulness(int page, int pageSize){
+        StringBuilder builder = new StringBuilder();
+        builder.append("FOR r IN @@collection\n");
+        builder.append("SORT r.helpfulCount DESC\n");
+        builder.append("LIMIT " + page * pageSize + ", " + pageSize + "\n");
+        builder.append("RETURN r");
+
+        String query = builder.toString();
+        Map<String, Object> bindVars = new MapBuilder()
+                .put("@collection", NAME)
+                .get();
+
+        return db.query(query, bindVars, null, Rating.class).asListRemaining();
+    }
 }

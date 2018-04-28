@@ -1,6 +1,5 @@
 package project2.gintonics.Entities;
 
-import java.util.List;
 
 public class Rating extends Primitive {
     private String combinationKey;
@@ -68,11 +67,6 @@ public class Rating extends Primitive {
         return helpfulCount;
     }
 
-    public void setHelpfulCount(int helpfulCount) {
-        this.helpfulCount = helpfulCount;
-    }
-
-
     public String prettyPrint(){
         StringBuilder response = new StringBuilder();
         response.append("Rating: "  + name);
@@ -81,6 +75,7 @@ public class Rating extends Primitive {
         response.append("\n\tuserName: "  + userName);
         response.append("\n\tuserKey: "  + userKey);
         response.append("\n\tratingValue: "  + ratingValue);
+        response.append("\n\thelpfulCount: "  + helpfulCount);
         response.append("\n\tcomments: "  + comments);
         return response.toString();
     }

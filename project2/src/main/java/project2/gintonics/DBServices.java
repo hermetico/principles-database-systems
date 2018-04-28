@@ -127,7 +127,6 @@ public class DBServices implements IDBServices {
         return combinations.existsByGinAndTonicAndGarnish(gin, tonic, garnish);
     }
 
-
     @Override
     public int getNumCombinations() {
         return combinations.getSize();
@@ -173,6 +172,25 @@ public class DBServices implements IDBServices {
         users.resetCollection();
     }
 
+    @Override
+    public List<User> getUsersByName(String name) {
+        return users.getByName(name);
+    }
+
+    @Override
+    public User getUserByKey(String key) {
+        return users.getByKey(key);
+    }
+
+    @Override
+    public List<Rating> getAllRatings() {
+        return ratings.getAll();
+    }
+
+    @Override
+    public int getCountOfRatingsByCombination(Combination combination) {
+        return ratings.getCountOfByCombinationKey(combination);
+    }
 
     /**
      * Creates a new rating based in the input parameters, and returns the rating
@@ -199,7 +217,7 @@ public class DBServices implements IDBServices {
 
     @Override
     public List<Rating> getRatingsByCombination(Combination combination) {
-        return getRatingsByCombination(combination, 0, Constraints.MAXRECORDS);
+        return ratings.getByCombinationKey(combination, 0, Constraints.MAXRECORDS);
     }
 
     @Override
@@ -210,6 +228,61 @@ public class DBServices implements IDBServices {
     @Override
     public void resetRatingsCollection() {
         ratings.resetCollection();
+    }
+
+    @Override
+    public List<Rating> getRatingsByUserName(String userName) {
+        return ratings.getByUserName(userName, 0, Constraints.MAXRECORDS);
+    }
+
+    @Override
+    public List<Rating> getRatingsByUserName(String userName, int page, int pageSize) {
+        return ratings.getByUserName(userName, page, pageSize);
+    }
+
+    @Override
+    public int getCountOfRatingsByUserName(String userName) {
+        return ratings.getCountOfByUserName(userName);
+    }
+
+    @Override
+    public List<Rating> getRatingsByUserKey(String userKey) {
+        return ratings.getByUserKey(userKey, 0, Constraints.MAXRECORDS);
+    }
+
+    @Override
+    public List<Rating> getRatingsByUserKey(String userKey, int page, int pageSize) {
+        return ratings.getByUserKey(userKey, page, pageSize);
+    }
+
+    @Override
+    public int getCountOfRatingsByUserKey(String userKey) {
+        return ratings.getCountOfByUserKey(userKey);
+    }
+
+    @Override
+    public Rating markRatingAsHelpful(Rating rating) {
+        return ratings.increaseHelpfulCountByKey(rating.getKey());
+    }
+
+    @Override
+    public Rating markRatingAsHelpful(String ratingKey) {
+        return ratings.increaseHelpfulCountByKey(ratingKey);
+    }
+
+    @Override
+    public int getNumRatings() {
+        return ratings.getSize();
+    }
+
+    @Override
+    public List<Rating> getRatingsSortedByHelpfulness() {
+        return ratings.getSortedByHelpfulness(0, Constraints.MAXRECORDS);
+    }
+
+    @Override
+    public List<Rating> getRatingsSortedByHelpfulness(int page, int pageSize) {
+        return ratings.getSortedByHelpfulness(page, pageSize);
     }
 
     @Override
