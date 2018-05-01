@@ -26,7 +26,7 @@ public class GeneralConnectorServicesTests {
     @Before
     public void setUp() throws Exception {
         dbServices = new DBServices(HOST, PORT, USER, PASSWORD);
-        //dbServices.resetCollections();
+        dbServices.resetCollections();
 
         fillDB();
     }
@@ -83,6 +83,7 @@ public class GeneralConnectorServicesTests {
         scanner.close();
 
     }
+
 
     @Test
     public void createUser() {
