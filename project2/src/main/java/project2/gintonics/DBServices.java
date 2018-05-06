@@ -22,7 +22,7 @@ public class DBServices implements IDBServices {
 
     public DBServices(String host, String port, String user, String password){
         connector = new Connector(host, port, user, password);
-        connector.init();
+        connector.connect();
         linkServices();
 
     }

@@ -40,14 +40,9 @@ public class Connector {
 
 
 
-    public void init(){
+    public void connect(){
         loadDB();
-        gins = new Gins(db);
-        tonics = new Tonics(db);
-        garnishes = new Garnishes(db);
-        combinations = new Combinations(db);
-        users = new Users(db);
-        ratings = new Ratings(db);
+        init(false);
     }
 
     private void loadDB(){
@@ -76,13 +71,19 @@ public class Connector {
     }
 
     public void resetAllCollections(){
-        gins.resetCollection();
-        tonics.resetCollection();
-        garnishes.resetCollection();
-        combinations.resetCollection();
-        users.resetCollection();
-        ratings.resetCollection();
+        init(true);
     }
+
+    public void init(boolean reset){
+        gins = new Gins(db);
+        tonics = new Tonics(db);
+        garnishes = new Garnishes(db);
+        combinations = new Combinations(db, reset);
+        users = new Users(db);
+        ratings = new Ratings(db);
+    }
+
+
 
 
 }

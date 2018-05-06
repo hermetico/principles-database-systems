@@ -25,7 +25,7 @@ public class CollectionConnectorServicesTests {
     @Before
     public void setUp() throws Exception {
         connector = new Connector(HOST, PORT, USER, PASSWORD);
-        connector.init();
+        connector.connect();
         connector.resetAllCollections();
         fillDB();
 
@@ -84,6 +84,7 @@ public class CollectionConnectorServicesTests {
         scanner.close();
 
     }
+
     @Test
     public void printAndCountCombinations(){
         System.out.println("Printing all combinations");
@@ -155,7 +156,6 @@ public class CollectionConnectorServicesTests {
         connector.garnishes.delete(all.get(0).getKey());
         assertEquals(connector.garnishes.getAll().size(), total - 1);
     }
-
 
     @Test
     public void createUser() {

@@ -18,7 +18,7 @@ public class Application {
 
     public void runApplication(){
         service = new Connector(HOST, PORT, USER, PASSWORD);
-        service.init();
+        service.connect();
         inputLoop();
     }
 
