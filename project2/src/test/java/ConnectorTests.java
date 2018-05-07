@@ -61,7 +61,7 @@ public class ConnectorTests {
                 dbServices.insertTonic(tonic);
             }
 
-            if(parts.length > 4) {
+            if(parts.length > 3){
                 garnish = new Garnish(parts[3]);
                 if(!dbServices.existsGarnishByName(garnish.getName())){
                     dbServices.insertGarnish(garnish);
@@ -143,7 +143,7 @@ public class ConnectorTests {
 
     @Test
     public void createManyRatings(){
-       createManyRatings(100);
+       createManyRatings(1000);
 
     }
 
@@ -158,7 +158,7 @@ public class ConnectorTests {
         int numCombinations = combinations.size();
         List<User> users = dbServices.getAllUsers();
         int numUsers = users.size();
-        for(int i = 0; i < 10000; i++){
+        for(int i = 0; i < count; i++){
             Combination combi = combinations.get(i % numCombinations);
             User user = users.get(i % numUsers);
             dbServices.rateCombination(combi, user, "Good enough", rn.nextInt(11));

@@ -61,7 +61,7 @@ public class RequirementsTests {
                 dbServices.insertTonic(tonic);
             }
 
-            if(parts.length > 4) {
+            if(parts.length > 3){
                 garnish = new Garnish(parts[3]);
                 if(!dbServices.existsGarnishByName(garnish.getName())){
                     dbServices.insertGarnish(garnish);
@@ -116,12 +116,11 @@ public class RequirementsTests {
         out.println("\nNow we are going to query the full rating");
         queryFullRatingsByUserName("Juan");
 
-        out.println("\nSetting some ratings as helpful and showing 25 top most helpful ratings");
+        out.println("\nSetting some ratings as helpful and showing 10 top most helpful ratings");
         setRatingsAsHelpful(350);
-        showRatingsByHelpfulness(25);
+        showRatingsByHelpfulness(10);
 
     }
-
 
     public void createUser(String name){
         User user = new User(name);

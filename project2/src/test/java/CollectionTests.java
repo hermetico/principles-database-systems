@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
-public class CollectionConnectorServicesTests {
+public class CollectionTests {
     private final String HOST = "localhost";
     private final String PORT = "8529";
     private final String USER = "root";
@@ -65,7 +65,7 @@ public class CollectionConnectorServicesTests {
                 connector.tonics.insert(tonic);
             }
 
-            if(parts.length > 4) {
+            if(parts.length > 3){
                 garnish = new Garnish(parts[3]);
                 if(!connector.garnishes.existsByName(garnish.getName())){
                     connector.garnishes.insert(garnish);
