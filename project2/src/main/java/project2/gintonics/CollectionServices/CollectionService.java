@@ -5,8 +5,11 @@ import com.arangodb.ArangoDBException;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.DocumentCreateEntity;
+import com.arangodb.model.HashIndexOptions;
 import com.arangodb.util.MapBuilder;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +57,25 @@ public class CollectionService implements ICollectionService {
             err.println("Collection " + collectionName + "did not exist");
         }
         collection = null;
+    }
+
+    protected void createIndex(String key){
+        Collection<String> indexes = new ArrayList<String>();
+        indexes.add(key);
+        HashIndexOptions options = new HashIndexOptions();
+        options.unique(false);
+        options.sparse(false);
+        collection.createHashIndex(indexes, options);
+    }
+
+    protected void createCombinedIndex(String one, String two){
+        Collection<String> indexes = new ArrayList<String>();
+        indexes.add(one);
+        indexes.add(two);
+        HashIndexOptions options = new HashIndexOptions();
+        options.unique(false);
+        options.sparse(false);
+        collection.createHashIndex(indexes, options);
     }
 
     public void resetCollection(){

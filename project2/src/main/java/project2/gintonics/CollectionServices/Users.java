@@ -9,8 +9,9 @@ import java.util.List;
 public class Users extends CollectionService {
     public static final String NAME = "users";
 
-    public Users(ArangoDatabase db) {
+    public Users(ArangoDatabase db, boolean reset) {
         super(db, NAME);
+        if(reset) resetCollection();
     }
 
 

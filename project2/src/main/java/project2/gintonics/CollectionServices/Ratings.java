@@ -15,8 +15,10 @@ import java.util.Map;
 public class Ratings extends CollectionService {
     private static final String NAME = "ratings";
 
-    public Ratings(ArangoDatabase db) {
+    public Ratings(ArangoDatabase db, boolean reset) {
         super(db, NAME);
+        if(reset) resetCollection();
+        createIndex("combinationKey");
     }
 
     public List<Rating> getAll() {

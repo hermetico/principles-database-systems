@@ -68,11 +68,6 @@ public class DBServices implements IDBServices {
     }
 
     @Override
-    public void resetGinsCollection() {
-        gins.resetCollection();
-    }
-
-    @Override
     public boolean existsTonicByName(String name) {
         return tonics.existsByName(name);
     }
@@ -88,11 +83,6 @@ public class DBServices implements IDBServices {
     }
 
     @Override
-    public void resetTonicsCollection() {
-        tonics.resetCollection();
-    }
-
-    @Override
     public boolean existsGarnishByName(String name) {
         return garnishes.existsByName(name);
     }
@@ -105,11 +95,6 @@ public class DBServices implements IDBServices {
     @Override
     public void insertGarnish(Garnish garnish) {
         garnishes.insert(garnish);
-    }
-
-    @Override
-    public void resetGarnishesCollection() {
-        garnishes.resetCollection();
     }
 
     @Override
@@ -148,11 +133,6 @@ public class DBServices implements IDBServices {
     }
 
     @Override
-    public void resetCombinationsCollection() {
-        combinations.resetCollection();
-    }
-
-    @Override
     public int getNumUsers(){
         return users.getSize();
     }
@@ -165,11 +145,6 @@ public class DBServices implements IDBServices {
     @Override
     public void insertUser(User user) {
         users.insert(user);
-    }
-
-    @Override
-    public void resetUsersCollection() {
-        users.resetCollection();
     }
 
     @Override
@@ -223,11 +198,6 @@ public class DBServices implements IDBServices {
     @Override
     public List<Rating> getRatingsByCombination(Combination combination, int page, int pageSize) {
         return ratings.getByCombinationKey(combination, page, pageSize);
-    }
-
-    @Override
-    public void resetRatingsCollection() {
-        ratings.resetCollection();
     }
 
     @Override

@@ -10,8 +10,9 @@ import java.util.List;
 public class Garnishes extends CollectionService{
     private static final String NAME = "garnishes";
 
-    public Garnishes(ArangoDatabase db) {
+    public Garnishes(ArangoDatabase db, boolean reset) {
         super(db, NAME);
+        if(reset) resetCollection();
     }
 
     public List<Garnish> getAll() {

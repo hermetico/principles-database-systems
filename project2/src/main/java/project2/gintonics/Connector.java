@@ -75,12 +75,12 @@ public class Connector {
     }
 
     public void init(boolean reset){
-        gins = new Gins(db);
-        tonics = new Tonics(db);
-        garnishes = new Garnishes(db);
+        gins = new Gins(db, reset);
+        tonics = new Tonics(db, reset);
+        garnishes = new Garnishes(db, reset);
         combinations = new Combinations(db, reset);
-        users = new Users(db);
-        ratings = new Ratings(db);
+        users = new Users(db, reset);
+        ratings = new Ratings(db, reset);
     }
 
 

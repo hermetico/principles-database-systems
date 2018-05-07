@@ -11,8 +11,9 @@ import java.util.List;
 public class Tonics extends CollectionService{
     private static final String NAME = "tonics";
 
-    public Tonics(ArangoDatabase db) {
+    public Tonics(ArangoDatabase db, boolean reset) {
         super(db, NAME);
+        if(reset) resetCollection();
     }
 
     public List<Tonic> getAll() {

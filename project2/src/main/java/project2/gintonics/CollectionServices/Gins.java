@@ -11,8 +11,9 @@ import java.util.List;
 public class Gins extends CollectionService{
     public static final String NAME = "gins";
 
-    public Gins(ArangoDatabase db) {
+    public Gins(ArangoDatabase db, boolean reset) {
         super(db, NAME);
+        if(reset) resetCollection();
     }
 
     public List<Gin> getAll() {

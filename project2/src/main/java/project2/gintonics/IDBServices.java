@@ -11,19 +11,16 @@ public interface IDBServices {
     boolean existsGinByName(String name);
     List<Gin> getAllGins();
     void insertGin(Gin gin);
-    void resetGinsCollection();
 
     // tonics
     boolean existsTonicByName(String name);
     List<Tonic> getAllTonics();
     void insertTonic(Tonic tonic);
-    void resetTonicsCollection();
 
     // garnishes
     boolean existsGarnishByName(String name);
     List<Garnish> getAllGarnishes();
     void insertGarnish(Garnish garnish);
-    void resetGarnishesCollection();
 
     // combinations
     boolean existsCombination(Combination combination);
@@ -33,13 +30,11 @@ public interface IDBServices {
     List<Combination> getAllCombinations();
     void insertCombination(Combination combination);
     Combination getCombinationByKey(String key);
-    void resetCombinationsCollection();
 
     // users
     int getNumUsers();
     List<User> getAllUsers();
     void insertUser(User user);
-    void resetUsersCollection();
     List<User> getUsersByName(String name);
     User getUserByKey(String key);
 
@@ -49,7 +44,6 @@ public interface IDBServices {
     Rating rateCombination(Combination combination, User user, String comment, int value);
     List<Rating> getRatingsByCombination(Combination combination);
     List<Rating> getRatingsByCombination(Combination combination, int page, int pageSize);
-    void resetRatingsCollection();
     List<Rating> getRatingsByUserName(String userName);
     List<Rating> getRatingsByUserName(String userName, int page, int pageSize);
     int getCountOfRatingsByUserName(String userName);
