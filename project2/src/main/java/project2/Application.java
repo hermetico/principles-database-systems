@@ -1,8 +1,12 @@
 package project2;
 
 import project2.gintonics.Connector;
+import project2.gintonics.DBServices;
+import project2.gintonics.Entities.*;
+import project2.gintonics.IDBServices;
 
 import java.io.*;
+import java.util.Scanner;
 
 public class Application {
     private final String HOST = "localhost";
@@ -15,35 +19,28 @@ public class Application {
     private PrintStream err = System.err;
 
     private Connector service;
+    private IDBServices dbservice;
 
     public void runApplication(){
         service = new Connector(HOST, PORT, USER, PASSWORD);
         service.connect();
+        dbservice = new DBServices(service);
         inputLoop();
     }
 
     public void inputLoop(){
         Scanner in = new Scanner(System.in);
         Scanner in2 = new Scanner(System.in);
-        Combination alexCombo = new Combination();
-        alexCombo.setGin("Alex");
-        alexCombo.setTonic("Alex");
-        User user = new User("Alex");
-        System.out.println("User: " + user.toString());
-        alexCombo.setName("AlexCombo");
-        //dbservice.insertCombination(alexCombo);
-        //dbservice.rateCombination(alexCombo,user,"Ahuenchikom", 5);
-
 
         int a;
         String b;
         int c;
-        out.println("Welcome to Gin and Tonic ultimate menu");
+        out.println("Welcome to Gin and Tonic ultimate menu (alpha version)");
         out.println("Please select what you want to do, by inputting the number corresponding to your choice");
         out.println("1. Create new Gin, Tonic or Garnish");
         out.println("2. Search for Gin, Tonic or Garnish");
-        out.println("3. Search for a combination");
-        out.println("4. List combinations I have rated");
+        out.println("3. Search for a combination (Not implemented)");
+        out.println("4. List combinations I have rated (Not implemented)");
         if(in.hasNextInt()) {
             a = in.nextInt();
 

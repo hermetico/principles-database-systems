@@ -11,10 +11,14 @@ public class Combinations extends CollectionService {
 
     public Combinations(ArangoDatabase db, boolean reset) {
         super(db, NAME);
-        if(reset) resetCollection();
-        //createIndex("gin");
-        //createIndex("tonic");
-        createCombinedIndex("gin", "tonic");
+        if(reset)
+        {
+            resetCollection();
+            //createIndex("gin");
+            //createIndex("tonic");
+            createCombinedIndex("gin", "tonic");
+        }
+
     }
 
 

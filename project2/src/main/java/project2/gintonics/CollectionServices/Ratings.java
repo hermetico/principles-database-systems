@@ -17,8 +17,11 @@ public class Ratings extends CollectionService {
 
     public Ratings(ArangoDatabase db, boolean reset) {
         super(db, NAME);
-        if(reset) resetCollection();
-        createIndex("combinationKey");
+        if(reset) {
+            resetCollection();
+            createIndex("combinationKey");
+        }
+
     }
 
     public List<Rating> getAll() {
